@@ -67,6 +67,15 @@ jobs:
           grep -q "VX-SEC-003" rust.sarif
           echo "rust rule pack verified in SARIF"
 
+      - name: Scan a real crate via composite action
+        uses: ./
+        with:
+          mode: scan
+          target: crate:tinyjson@2.5.1
+        # third-party findings are evidence, not our gate (same policy as
+        # the npm real-package scan)
+        continue-on-error: true
+
       - name: Test the filesystem-safe template via composite action
         uses: ./
         with:
