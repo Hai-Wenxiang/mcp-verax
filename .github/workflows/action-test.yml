@@ -79,3 +79,10 @@ jobs:
         with:
           mode: test
           files: templates/web-fetch-md/tests/server.suite.yaml
+
+      - name: Scan a real published package via composite action
+        uses: ./
+        with:
+          mode: scan
+          target: "@modelcontextprotocol/server-memory"
+          sarif: real.sarif
