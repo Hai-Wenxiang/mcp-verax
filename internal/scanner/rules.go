@@ -2,6 +2,8 @@ package scanner
 
 import "strings"
 
+func stringsHasSuffix(s, suf string) bool { return strings.HasSuffix(s, suf) }
+
 // sourceRule inspects one source file's full text. Lang gates by language:
 // "" = language-agnostic, "js" = JS/TS, "py" = Python.
 type sourceRule struct {
@@ -53,6 +55,9 @@ var quaMetaMissing = packageRule{
 	Title: "package metadata incomplete",
 	Sev:   SevLow,
 	Check: func(rel string, data []byte) []Finding {
+		if !stringsHasSuffix(rel, "package.json") {
+			return nil // pyproject handled by its own rule
+		}
 		if len(data) == 0 {
 			return []Finding{{
 				RuleID: "VX-QUA-105", Title: "package.json missing", Severity: SevMedium,

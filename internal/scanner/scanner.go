@@ -63,7 +63,7 @@ func Scan(root string, target string) (*Result, error) {
 				return fs.SkipDir
 			}
 			return nil
-		case name == "package.json" && (pkgPath == "" || len(rel) < len(pkgPath)):
+		case (name == "package.json" || name == "pyproject.toml") && (pkgPath == "" || len(rel) < len(pkgPath)):
 			pkgPath = rel
 		case sourceExts[strings.ToLower(filepath.Ext(name))]:
 			data, rerr := os.ReadFile(path)
@@ -91,6 +91,7 @@ func Scan(root string, target string) (*Result, error) {
 			for _, rule := range packageRules {
 				res.Findings = append(res.Findings, rule.Check(pkgPath, data)...)
 			}
+			_ = 0
 		}
 	}
 	if pkgPath == "" && res.Files > 0 {

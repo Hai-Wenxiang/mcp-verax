@@ -72,7 +72,9 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 | notes-store template | ✅ Done | zero-dep CRUD, id sanitize + caps; suite 8/8, self-scan 100/100 |
 | `verax new` scaffolder | ✅ Done | templates embedded in binary; scaffold→cd→suite e2e green |
 | VX-DYN-201 SSRF probe (suite-level dynamic) | ✅ Done |
-| VX-DYN-202 side-effect probe (honeypot diff) | ✅ Done | write-while-read-only detection, per-tool change evidence | honeyport + string-arg injection; e2e on official everything (17 tools, 0 hits) |
+| VX-DYN-202 side-effect probe (honeypot diff) | ✅ Done | write-while-read-only detection, per-tool change evidence |
+| Python project scanning (pyproject.toml) | ✅ Done | PEP-621 metadata rule; manifests dispatched by type |
+| verax test -j N parallel suites | ✅ Done | bounded pool, order-stable reports; 4 suites live 27/27 | honeyport + string-arg injection; e2e on official everything (17 tools, 0 hits) |
 | rest-api-wrap template | ✅ Done | zero-dep OpenAPI subset + offline demo harness; suite 7/7 (path/body/404/allowlist) |
 | web-fetch-md template + result.not_contains | ✅ Done | fixed-port offline harness; scripts/styles leak check; suite 7/7, scan 100 |
 | next templates (db-readonly, …) | ⬜ Next | |

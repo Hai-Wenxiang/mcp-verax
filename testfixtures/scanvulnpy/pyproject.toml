@@ -1,0 +1,7 @@
+[build-system]
+requires = ["setuptools>=61"]
+
+[project]
+name = "scanvuln-py"
+version = "0.1.0"
+# license, description, repo link all missing on purpose
