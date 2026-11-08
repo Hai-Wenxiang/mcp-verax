@@ -83,8 +83,8 @@ verax test suite.yaml -u    # rewrite goldens (review the diff!)
 | tools/resources/prompts discovery assertions | ✅ |
 | tools/call assertions (ok/is_error/contains) | ✅ |
 | Golden snapshots + `-u` | ✅ |
-| Latency SLO (p95, concurrency) | F5 |
-| Process-leak & hang detection | F5 |
+| Latency SLO (p95, concurrency) | ✅ F5 |
+| Process-leak & hang detection | ✅ F5 |
 | Schema-driven fuzzing | F6 |
 | JUnit XML + HTML reports | F7 |
 | GitHub Action | F8 |

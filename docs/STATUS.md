@@ -12,7 +12,7 @@
 | F2 Suite DSL parser (YAML schema, validation, env expansion) | ✅ Done | 13 tests; strict unknown-field rejection |
 | F3 Assertion engine (assertions + snapshots) | ✅ Done | 15 tests; jest-style golden snapshots |
 | F4 Runner + CLI (`verax test`) + terminal reporter | ✅ Done | shared/respawn modes; example suite smoke 3/3 |
-| F5 SLO (latency p95, concurrency) + process-leak + hang detection | ⬜ Planned | |
+| F5 SLO (latency p95, concurrency) + process-leak + hang detection | ✅ Done | ns-precision timing; tree kill; leak(process_exit) case |
 | F6 Schema-driven fuzzing + injection dictionaries | ⬜ Planned | |
 | F7 Reporters (JUnit XML, static HTML) | ⬜ Planned | |
 | F8 GitHub Action + release pipeline | ⬜ Planned | |
