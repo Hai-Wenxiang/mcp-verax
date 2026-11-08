@@ -1,0 +1,21 @@
+# Verax compatibility suite — official @modelcontextprotocol/server-memory
+# Read-only tools only: this suite must not write memory.jsonl into compat/.
+suite: official-memory
+target:
+  command: npx -y @modelcontextprotocol/server-memory
+  timeout_startup_ms: 180000
+case:
+  - name: tool catalogue
+    expect:
+      tools.list.includes: [read_graph, search_nodes]
+  - name: read empty graph is fine
+    call: read_graph
+    expect:
+      ok: true
+  - name: search finds nothing in empty graph
+    call: search_nodes
+    args: {query: "verax"}
+    expect:
+      ok: true
+leak:
+  process_exit: true

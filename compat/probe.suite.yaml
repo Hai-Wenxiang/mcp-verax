@@ -1,0 +1,11 @@
+# Probe trick: a deliberately-impossible `tools.list.includes` fails with a
+# detail line listing every tool the server actually exposes — use this to
+# discover real catalogues when writing suites for third-party servers.
+suite: probe-everything
+target:
+  command: npx -y @modelcontextprotocol/server-everything
+  timeout_startup_ms: 180000
+case:
+  - name: dump tool names
+    expect:
+      tools.list.includes: [__no_such_tool__]

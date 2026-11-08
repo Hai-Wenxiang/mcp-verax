@@ -1,0 +1,31 @@
+# Verax compatibility suite — official @modelcontextprotocol/server-sequential-thinking
+suite: official-sequentialthinking
+target:
+  # NOTE: the package name must be quoted — npx eats "-thinking" as its own flag.
+  command: npx -y "@modelcontextprotocol/server-sequential-thinking"
+  timeout_startup_ms: 180000
+case:
+  - name: tool catalogue
+    expect:
+      tools.list.includes: [sequentialthinking]
+  - name: one-shot thought completes
+    call: sequentialthinking
+    args:
+      thought: "verax compat check"
+      nextThoughtNeeded: false
+      thoughtNumber: 1
+      totalThoughts: 1
+    expect:
+      ok: true
+      result.contains: ["1"]
+  - name: invalid thoughtNumber rejected
+    call: sequentialthinking
+    args:
+      thought: "bad"
+      nextThoughtNeeded: false
+      thoughtNumber: -1
+      totalThoughts: 1
+    expect:
+      error.contains: "thoughtNumber"
+leak:
+  process_exit: true

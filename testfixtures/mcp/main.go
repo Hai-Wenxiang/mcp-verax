@@ -52,18 +52,23 @@ func main() {
 				continue
 			}
 			if os.Getenv("MCP_DROP_HANDSHAKE") == "1" {
+				fmt.Fprintln(os.Stderr, "fixture: handshake dropped (MCP_DROP_HANDSHAKE=1)")
 				continue // swallow: handshake hangs
+			}
+			caps := map[string]any{
+				"tools":     map[string]any{"listChanged": true},
+				"resources": map[string]any{"subscribe": true},
+				"prompts":   map[string]any{"listChanged": true},
+				"logging":   map[string]any{},
+			}
+			if os.Getenv("MCP_NO_PROMPTS") == "1" {
+				delete(caps, "prompts") // servers may legitimately lack primitives
 			}
 			respond(w, env_.ID, map[string]any{
 				"protocolVersion": env("MCP_FAKE_VERSION", defaultVersion),
-				"capabilities": map[string]any{
-					"tools":     map[string]any{"listChanged": true},
-					"resources": map[string]any{"subscribe": true},
-					"prompts":   map[string]any{"listChanged": true},
-					"logging":   map[string]any{},
-				},
-				"serverInfo":   map[string]any{"name": "mcp-fixture", "version": "0.1.0"},
-				"instructions": "Fixture server for Verax self-tests.",
+				"capabilities":    caps,
+				"serverInfo":      map[string]any{"name": "mcp-fixture", "version": "0.1.0"},
+				"instructions":    "Fixture server for Verax self-tests.",
 			})
 		case "notifications/initialized":
 			initialized = true
@@ -156,6 +161,10 @@ func main() {
 			})
 		case "prompts/list":
 			if isNotification {
+				continue
+			}
+			if os.Getenv("MCP_NO_PROMPTS") == "1" {
+				respondErr(w, env_.ID, -32601, "prompts not supported by this fixture", nil)
 				continue
 			}
 			respond(w, env_.ID, map[string]any{

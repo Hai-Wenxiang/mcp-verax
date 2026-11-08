@@ -16,6 +16,7 @@ import (
 
 	"github.com/Hai-Wenxiang/mcp-verax/internal/assert"
 	"github.com/Hai-Wenxiang/mcp-verax/internal/dsl"
+	"github.com/Hai-Wenxiang/mcp-verax/internal/jsonrpc"
 	"github.com/Hai-Wenxiang/mcp-verax/internal/mcpclient"
 )
 
@@ -296,25 +297,49 @@ func runCase(cli *mcpclient.Client, c dsl.Case, store *assert.SnapshotStore, opt
 	return res
 }
 
+// discover fetches the primitives the server actually has: each list call is
+// gated by the advertised capability and tolerates -32601 (method not found)
+// as "primitive absent". Official reference servers (e.g. the filesystem
+// server) legitimately implement only a subset of tools/resources/prompts.
 func discover(ctx context.Context, cli *mcpclient.Client) (assert.Discovery, error) {
-	tools, err := cli.ListTools(ctx)
-	if err != nil {
-		return assert.Discovery{}, err
+	disc := assert.Discovery{HandshakeOK: true}
+	caps := cli.InitializeResult().Capabilities
+
+	if tools, err := cli.ListTools(ctx); err != nil {
+		if !methodNotFound(err) {
+			return assert.Discovery{}, err
+		}
+	} else {
+		disc.Tools = tools.Tools
 	}
-	resources, err := cli.ListResources(ctx)
-	if err != nil {
-		return assert.Discovery{}, err
+	if caps.Resources != nil {
+		if resources, err := cli.ListResources(ctx); err != nil {
+			if !methodNotFound(err) {
+				return assert.Discovery{}, err
+			}
+		} else {
+			disc.Resources = resources.Resources
+		}
 	}
-	prompts, err := cli.ListPrompts(ctx)
-	if err != nil {
-		return assert.Discovery{}, err
+	if caps.Prompts != nil {
+		if prompts, err := cli.ListPrompts(ctx); err != nil {
+			if !methodNotFound(err) {
+				return assert.Discovery{}, err
+			}
+		} else {
+			disc.Prompts = prompts.Prompts
+		}
 	}
-	return assert.Discovery{
-		HandshakeOK: true,
-		Tools:       tools.Tools,
-		Resources:   resources.Resources,
-		Prompts:     prompts.Prompts,
-	}, nil
+	return disc, nil
+}
+
+// methodNotFound reports whether err is a JSON-RPC -32601.
+func methodNotFound(err error) bool {
+	var rpcErr *jsonrpc.RPCError
+	if !errors.As(err, &rpcErr) {
+		return false
+	}
+	return rpcErr.Code == -32601
 }
 
 func statusFromChecks(checks []assert.CheckResult) Status {

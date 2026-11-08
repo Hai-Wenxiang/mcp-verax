@@ -1,0 +1,40 @@
+# Verax compatibility suite — official @modelcontextprotocol/server-everything
+# The canonical test server exercising most MCP features.
+suite: official-everything
+target:
+  command: npx -y @modelcontextprotocol/server-everything
+  timeout_startup_ms: 180000   # npx may download the package on first run
+case:
+  - name: tool catalogue (v2.2.1 names)
+    expect:
+      tools.list.includes: [echo, get-sum, trigger-long-running-operation]
+  - name: echo round trip
+    call: echo
+    args:
+      message: "hello from verax compat"
+    expect:
+      ok: true
+      result.contains: ["hello from verax compat"]
+  - name: get-sum computes
+    call: get-sum
+    args: {a: 2, b: 3}
+    expect:
+      ok: true
+      result.contains: ["5"]
+  - name: missing get-sum args rejected
+    call: get-sum
+    args: {}
+    expect:
+      error.contains: "a"
+slo:
+  tool: echo
+  args: {message: "slo"}
+  p95_call_ms: 20000
+  sample_calls: 10
+fuzz:
+  runs: 10
+  seed: 7
+  hang_ms: 30000
+  tools: [echo, get-sum]
+leak:
+  process_exit: true

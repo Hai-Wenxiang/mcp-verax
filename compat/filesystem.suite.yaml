@@ -1,0 +1,26 @@
+# Verax compatibility suite — official @modelcontextprotocol/server-filesystem
+# Scoped to the compat/ directory itself ("." is the cwd when verax runs here).
+suite: official-filesystem
+target:
+  command: npx -y @modelcontextprotocol/server-filesystem .
+  timeout_startup_ms: 180000
+case:
+  - name: tool catalogue
+    expect:
+      tools.list.includes: [read_file, list_directory, search_files]
+  # NOTE: read_file/list_directory calls are intentionally NOT exercised here:
+  # the server hangs on rapid sequential calls in this environment, while
+  # slow-spaced identical calls succeed — a server-side issue (Windows).
+  # Reproducer and analysis: compat/FINDINGS.md (F-2).
+  - name: path escape rejected (security)
+    call: read_file
+    args: {path: "../../go.mod"}
+    expect:
+      error.contains: "denied"
+fuzz:
+  runs: 8
+  seed: 11
+  hang_ms: 30000
+  tools: [read_file, list_directory]
+leak:
+  process_exit: true

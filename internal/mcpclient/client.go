@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -91,7 +92,18 @@ func Connect(ctx context.Context, cfg StdioConfig, opts Options) (*Client, error
 	go c.readLoop()
 
 	if err := c.handshake(ctx); err != nil {
+		// Attach the server's last stderr lines: a server that dies during
+		// initialize (crash, bad config, 404 from npx) leaves its reason
+		// on stderr — without this the caller is blind.
+		lines := c.tr.Stderr()
+		tail := lines
+		if len(tail) > 6 {
+			tail = tail[len(tail)-6:]
+		}
 		_ = c.Close()
+		if len(tail) > 0 {
+			err = fmt.Errorf("%w\nserver stderr:\n  %s", err, strings.Join(tail, "\n  "))
+		}
 		return nil, err
 	}
 	return c, nil
