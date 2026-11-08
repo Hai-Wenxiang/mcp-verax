@@ -15,6 +15,7 @@ const maxScanBytes = 4 << 20 // 4 MiB
 // sourceExts are file types inspected line-by-line by source rules.
 var sourceExts = map[string]bool{
 	".js": true, ".cjs": true, ".mjs": true, ".ts": true, ".cts": true, ".mts": true,
+	".py": true,
 }
 
 // ResolveTarget decides whether target is a local directory (with or without
@@ -70,7 +71,11 @@ func Scan(root string, target string) (*Result, error) {
 				return nil
 			}
 			res.Files++
+			lang := langOf(rel)
 			for _, rule := range sourceRules {
+				if rule.Lang != "" && rule.Lang != lang {
+					continue
+				}
 				res.Findings = append(res.Findings, rule.Check(rel, string(data))...)
 			}
 		}

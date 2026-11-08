@@ -33,6 +33,7 @@ func bareEnvRef(content string, end int) bool {
 // results, logs or spreads — leaks every secret the server can see.
 var secEnvDump = sourceRule{
 	ID:    "VX-SEC-001",
+	Lang:  "js",
 	Title: "whole-environment exposure (bare process.env)",
 	Sev:   SevCritical,
 	Check: func(rel, content string) []Finding {
@@ -68,6 +69,7 @@ var dynamicExecRe = regexp.MustCompile(`\b(exec|execSync|spawn|spawnSync)\(\s*[^
 // command-injection surface.
 var secShellExec = sourceRule{
 	ID:    "VX-SEC-003",
+	Lang:  "js",
 	Title: "shell command built from non-literal input",
 	Sev:   SevHigh,
 	Check: func(rel, content string) []Finding {

@@ -20,7 +20,12 @@ func TestRuleEvalInput(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	got := findingsBy(res, "VX-SEC-004")
+	var got []Finding
+	for _, f := range findingsBy(res, "VX-SEC-004") {
+		if f.File == "eval.js" { // python findings covered by TestPythonRules
+			got = append(got, f)
+		}
+	}
 	if len(got) != 2 {
 		for _, f := range got {
 			t.Logf("%s", f.Reason())
@@ -82,10 +87,10 @@ func TestVulnScoreDrops(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// previous 16 + 1 telemetry Medium + 1 fs-write High + 2 outbound Medium
-	// = 20 findings, well past the floor.
-	if len(res.Findings) != 20 {
-		t.Errorf("findings = %d, want 20", len(res.Findings))
+	// previous 20 + Python (2 eval + 2 shell + 2 deser-critical)
+	// + 1 empty catch + 2 PII patterns = 29 findings, past the floor.
+	if len(res.Findings) != 29 {
+		t.Errorf("findings = %d, want 29", len(res.Findings))
 		for _, f := range res.Findings {
 			t.Logf("%s", f.Reason())
 		}

@@ -68,8 +68,8 @@ func TestCLIScanSARIFOutput(t *testing.T) {
 	if doc.Version != "2.1.0" || len(doc.Runs) != 1 || doc.Runs[0].Tool.Driver.Name != "verax" {
 		t.Errorf("sarif structure wrong: %s", raw)
 	}
-	if len(doc.Runs[0].Results) != 20 {
-		t.Errorf("sarif results = %d, want 20", len(doc.Runs[0].Results))
+	if len(doc.Runs[0].Results) != 29 {
+		t.Errorf("sarif results = %d, want 29", len(doc.Runs[0].Results))
 	}
 	levels := map[string]int{}
 	for _, r := range doc.Runs[0].Results {

@@ -21,6 +21,7 @@ var evalRe = regexp.MustCompile(`\beval\s*\(|\bnew\s+Function\s*\(`)
 // remote-code-execution surface even before considering tool inputs.
 var secEvalInput = sourceRule{
 	ID:    "VX-SEC-004",
+	Lang:  "js",
 	Title: "dynamic code evaluation (eval / new Function)",
 	Sev:   SevHigh,
 	Check: func(rel, content string) []Finding {

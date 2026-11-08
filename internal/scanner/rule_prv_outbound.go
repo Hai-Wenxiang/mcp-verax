@@ -100,6 +100,7 @@ var containmentRe = regexp.MustCompile(`(?i)(allowed|root|base|sandbox)[A-Za-z]*
 // visible containment check in the same file.
 var secFSWrite = sourceRule{
 	ID:    "VX-SEC-002",
+	Lang:  "js",
 	Title: "filesystem write to non-literal path",
 	Sev:   SevHigh,
 	Check: func(rel, content string) []Finding {
@@ -165,6 +166,7 @@ var allowlistRe = regexp.MustCompile(`(?i)allowlist|allow_?list|whitelist|white_
 // no visible allowlist — SSRF surface when tool inputs reach the URL.
 var secUnrestrictedOutbound = sourceRule{
 	ID:    "VX-SEC-008",
+	Lang:  "js",
 	Title: "outbound request to non-literal URL without allowlist",
 	Sev:   SevMedium,
 	Check: func(rel, content string) []Finding {

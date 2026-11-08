@@ -29,7 +29,12 @@ func TestRuleShellExec(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	got := findingsBy(res, "VX-SEC-003")
+	var got []Finding
+	for _, f := range findingsBy(res, "VX-SEC-003") {
+		if f.File == "shell.js" { // python findings covered by TestPythonRules
+			got = append(got, f)
+		}
+	}
 	if len(got) != 2 { // exec line + execSync line (shell:true same line deduped)
 		for _, f := range got {
 			t.Logf("%s", f.Reason())
@@ -37,7 +42,7 @@ func TestRuleShellExec(t *testing.T) {
 		t.Fatalf("want 2 shell findings, got %d", len(got))
 	}
 	for _, f := range got {
-		if f.File != "shell.js" || f.Severity != SevHigh {
+		if f.Severity != SevHigh {
 			t.Errorf("finding wrong: %+v", f)
 		}
 	}

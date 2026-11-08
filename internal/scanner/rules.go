@@ -2,11 +2,13 @@ package scanner
 
 import "strings"
 
-// sourceRule inspects one source file's full text.
+// sourceRule inspects one source file's full text. Lang gates by language:
+// "" = language-agnostic, "js" = JS/TS, "py" = Python.
 type sourceRule struct {
 	ID    string
 	Title string
 	Sev   Severity
+	Lang  string
 	Check func(rel, content string) []Finding
 }
 
