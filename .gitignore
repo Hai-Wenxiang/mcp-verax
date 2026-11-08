@@ -1,11 +1,11 @@
-# ---- 密钥与环境（永不入库）----
+# ===== 密钥与环境（永不入库）=====
 .env
 .env.*
 *.pem
 *.key
 secrets/
 
-# ---- Node / TypeScript ----
+# ===== Node / TypeScript =====
 node_modules/
 dist/
 build/
@@ -19,7 +19,7 @@ coverage/
 npm-debug.log*
 pnpm-debug.log*
 
-# ---- Python ----
+# ===== Python =====
 __pycache__/
 *.py[cod]
 .venv/
@@ -28,19 +28,32 @@ venv/
 .ruff_cache/
 .mypy_cache/
 *.egg-info/
-dist-packages/
 
-# ---- IDE / 编辑器 ----
+# ===== Go =====
+*.exe
+*.test
+*.out
+vendor/
+
+# ===== IDE / 编辑器 =====
 .idea/
 .vscode/*
 !.vscode/extensions.json
 *.swp
 
-# ---- 系统杂项 ----
+# ===== 系统杂项 =====
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# ---- 本项目特有 ----
-corpus-untrusted/          # 不可信样本隔离目录（独立子仓管理）
-fixtures/**/*.real.json    # 录制的真实响应默认不入库（含敏感字段）
+# ===== 本项目特有 =====
+# 不可信样本隔离目录（独立子仓管理）
+corpus-untrusted/
+# 录制的真实响应默认不入库（含敏感字段）
+fixtures/**/*.real.json
+# 实时进展日志：仅本地记录，不入库（见 AGENTS.md）
+WORKLOG.md
+# 构建产物
+bin/
+dist-out/
+__snapshots__/tmp/
