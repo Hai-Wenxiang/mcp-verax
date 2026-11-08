@@ -86,3 +86,6 @@ jobs:
           mode: scan
           target: "@modelcontextprotocol/server-memory"
           sarif: real.sarif
+        # third-party findings are evidence, not our gate: keep the pipeline
+        # honest without failing on someone else's CVEs
+        continue-on-error: true

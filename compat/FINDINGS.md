@@ -67,6 +67,16 @@ against our fixture or server-everything with identical request patterns.
 now with npm's stderr thanks to V-2). Quote the name:
 `npx -y "@modelcontextprotocol/server-sequential-thinking"`.
 
+### F-4 (server-memory 2.1.0): published with vulnerable dependency ranges
+
+`verax scan @modelcontextprotocol/server-memory` (2026-11-08, osv.dev):
+- `@modelcontextprotocol/server ^2.3.1` — 4 advisories
+  (GHSA-46jr-4wx8-v453, GHSA-f897-62hf-6gxq, GHSA-jm63-cq47-j5jp, GHSA-rvq5-wwqv-78pq)
+- `zod ^4.2.0` — 2 advisories (GHSA-m95q-7qp3-xv42, GHSA-mrhx-c7xc-m3w5)
+
+Score 80/100. Not malicious — just stale ranges; exactly the kind of signal
+"worth installing?" scans exist for. This scan now runs in CI on every push.
+
 ## 中文
 
 用真实套件（发现/调用/参数错误/SLO/fuzz/泄漏）驱动四个官方参考 server。这次自举 **为 Verax 抓出并修复 2 个 bug**，隔离 1 个服务器端 bug（附复现）。
