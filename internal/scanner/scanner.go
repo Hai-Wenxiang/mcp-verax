@@ -59,11 +59,11 @@ func Scan(root string, target string) (*Result, error) {
 		name := d.Name()
 		switch {
 		case d.IsDir():
-			if name == "node_modules" || name == ".git" || name == ".venv" || name == "__pycache__" {
+			if name == "node_modules" || name == ".git" || name == ".venv" || name == "__pycache__" || name == "testfixtures" {
 				return fs.SkipDir
 			}
 			return nil
-		case (name == "package.json" || name == "pyproject.toml") && (pkgPath == "" || len(rel) < len(pkgPath)):
+		case (name == "package.json" || name == "pyproject.toml" || name == "go.mod") && (pkgPath == "" || len(rel) < len(pkgPath)):
 			pkgPath = rel
 		case sourceExts[strings.ToLower(filepath.Ext(name))]:
 			data, rerr := os.ReadFile(path)
@@ -101,6 +101,15 @@ func Scan(root string, target string) (*Result, error) {
 		}
 	}
 
+	// VX-QUA-105/common: LICENSE file presence for non-npm projects
+	// (npm declares it in package.json, already checked there).
+	if pkgPath != "" && !strings.HasSuffix(pkgPath, "package.json") && !hasLICENSE(root) {
+		res.Findings = append(res.Findings, Finding{
+			RuleID: "VX-QUA-105", Title: "no LICENSE file", Severity: SevLow,
+			File: ".", Why: "users cannot legally rely on the project",
+		})
+	}
+
 	// VX-QUA-106: README presence — the cheapest trust signal for a listing.
 	if pkgPath != "" && !hasREADME(root) {
 		res.Findings = append(res.Findings, Finding{
@@ -109,6 +118,21 @@ func Scan(root string, target string) (*Result, error) {
 		})
 	}
 	return res, nil
+}
+
+// hasLICENSE reports whether a LICENSE/LICENCE file exists at the scan root.
+func hasLICENSE(root string) bool {
+	entries, err := os.ReadDir(root)
+	if err != nil {
+		return false
+	}
+	for _, e := range entries {
+		n := strings.ToUpper(e.Name())
+		if strings.HasPrefix(n, "LICENSE") || strings.HasPrefix(n, "LICENCE") {
+			return true
+		}
+	}
+	return false
 }
 
 // hasREADME reports whether a README exists at the scan root.
