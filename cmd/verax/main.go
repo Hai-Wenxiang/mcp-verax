@@ -109,13 +109,14 @@ func writeReport(path string, render func(*os.File) error) error {
 // (Go's flag package stops parsing at the first positional).
 func reorderFlags(args []string) []string {
 	valueFlags := map[string]bool{
-		"--junit": true, "--html": true, "--sarif": true,
+		"--junit": true, "--html": true, "--sarif": true, "--min-score": true,
 	}
 	var flags, positional []string
 	for i := 0; i < len(args); i++ {
 		a := args[i]
 		isValueFlag := valueFlags[a]
-		isEqFlag := strings.HasPrefix(a, "--junit=") || strings.HasPrefix(a, "--html=") || strings.HasPrefix(a, "--sarif=")
+		isEqFlag := strings.HasPrefix(a, "--junit=") || strings.HasPrefix(a, "--html=") ||
+			strings.HasPrefix(a, "--sarif=") || strings.HasPrefix(a, "--min-score=")
 		switch {
 		case isValueFlag:
 			if i+1 < len(args) {
