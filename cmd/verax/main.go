@@ -41,6 +41,8 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return runRules(args[1:], stdout, stderr)
 	case "new":
 		return runNew(args[1:], stdout, stderr)
+	case "init":
+		return runInit(args[1:], stdout, stderr)
 	default:
 		fmt.Fprintf(stderr, "verax: unknown command %q\n\n", args[0])
 		usage(stderr)
@@ -194,14 +196,16 @@ Usage:
 
 Commands:
   test       Run MCP server test suites (YAML-defined)
-               verax test [-u] [-v] <suite.yaml> [...]
-               -u  accept snapshot changes (rewrites goldens)
-               -v  verbose: show passing checks
+               verax test [-u] [-v] [--watch] [--repeat N] [-j N] <suite.yaml> [...]
+  scan       Statically scan a server (local dir or npm package) — 16+ rules
+               verax scan [--sarif x] [--json x] [--badge x] [--min-score N] <target>
+  init       Generate a starter suite from a running server
+               verax init <suite.yaml> -- <server command> [args...]
+  new        Scaffold a server from a template
+               verax new <template> <name> [--dir base]
+  rules      List scanner rules
   version    Print the verax version
   help       Show this help
-
-Upcoming:
-  scan       Security/quality rule packs (M2)
 
 Docs: https://github.com/Hai-Wenxiang/mcp-verax
 `)
