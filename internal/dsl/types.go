@@ -18,6 +18,7 @@ type Suite struct {
 	SLO      *SLO     `yaml:"slo"`
 	Fuzz     *Fuzz    `yaml:"fuzz"`
 	Leak     *Leak    `yaml:"leak"`
+	Probe    *Probe   `yaml:"probe"`
 
 	// Source is the file path the suite was loaded from (diagnostics only).
 	Source string `yaml:"-"`
@@ -98,6 +99,17 @@ type Fuzz struct {
 // Leak configures process-leak detection.
 type Leak struct {
 	ProcessExit bool `yaml:"process_exit"`
+}
+
+// Probe configures dynamic behaviour probes.
+type Probe struct {
+	SSRF *SSRFProbe `yaml:"ssrf"`
+}
+
+// SSRFProbe: inject a listener URL into every string argument of every tool
+// and report any server that makes the outbound connection.
+type SSRFProbe struct {
+	HangMS int `yaml:"hang_ms"` // per-call budget (default 5000)
 }
 
 // Validate checks the suite for structural errors and returns all problems

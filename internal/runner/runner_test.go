@@ -29,7 +29,7 @@ case:
   - name: discovery
     expect:
       tools.list.includes: [echo, fail, slow, env]
-      tools.list.count: 4
+      tools.list.count: 5
       tools.list.schema_valid: true
       prompts.list.includes: [greet]
       resources.list.min: 1

@@ -69,6 +69,7 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 | csv-query template | ✅ Done | zero-dep, caps + containment; suite 7/7, self-scan 100/100 |
 | notes-store template | ✅ Done | zero-dep CRUD, id sanitize + caps; suite 8/8, self-scan 100/100 |
 | `verax new` scaffolder | ✅ Done | templates embedded in binary; scaffold→cd→suite e2e green |
+| VX-DYN-201 SSRF probe (suite-level dynamic) | ✅ Done | honeyport + string-arg injection; e2e on official everything (17 tools, 0 hits) |
 | next templates (rest-api-wrap, db-readonly, …) | ⬜ Next | |
 
 ## M1 addendum: HTTP targets (2026-11-08 evening)

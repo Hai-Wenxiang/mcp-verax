@@ -51,7 +51,7 @@ case:
   - name: discovery over http
     expect:
       tools.list.includes: [echo, fail, slow, env]
-      tools.list.count: 4
+      tools.list.count: 5
       prompts.list.includes: [greet]
   - name: echo over http
     call: echo

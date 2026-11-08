@@ -125,6 +125,15 @@ func handleMessage(msg []byte, emit func(map[string]any)) {
 					"description": "Returns VERAX_PROBE (tests per-case env injection).",
 					"inputSchema": map[string]any{"type": "object"},
 				},
+				map[string]any{
+					"name":        "fetch_url",
+					"description": "Fetches a URL server-side (SSRF probe target).",
+					"inputSchema": map[string]any{
+						"type":       "object",
+						"properties": map[string]any{"url": map[string]any{"type": "string"}},
+						"required":   []string{"url"},
+					},
+				},
 			}},
 		})
 
@@ -146,6 +155,27 @@ func handleMessage(msg []byte, emit func(map[string]any)) {
 			emit(map[string]any{"jsonrpc": "2.0", "id": e.ID, "result": map[string]any{
 				"content": []any{map[string]any{"type": "text", "text": "VERAX_PROBE=" + os.Getenv("VERAX_PROBE")}},
 			}})
+		case "fetch_url":
+			var fu struct {
+				Arguments struct {
+					URL string `json:"url"`
+				} `json:"arguments"`
+			}
+			_ = json.Unmarshal(e.Params, &fu)
+			client := http.Client{Timeout: 3 * time.Second}
+			resp, ferr := client.Get(fu.Arguments.URL)
+			if ferr != nil {
+				emit(map[string]any{"jsonrpc": "2.0", "id": e.ID, "result": map[string]any{
+					"content": []any{map[string]any{"type": "text", "text": "fetch error: " + ferr.Error()}},
+					"isError": true,
+				}})
+				return
+			}
+			defer resp.Body.Close()
+			emit(map[string]any{"jsonrpc": "2.0", "id": e.ID, "result": map[string]any{
+				"content": []any{map[string]any{"type": "text", "text": fmt.Sprintf("status %s", resp.Status)}},
+			}})
+
 		case "fail":
 			emit(map[string]any{"jsonrpc": "2.0", "id": e.ID, "result": map[string]any{
 				"content": []any{map[string]any{"type": "text", "text": "tool failed on purpose"}},

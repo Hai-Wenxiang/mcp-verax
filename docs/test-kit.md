@@ -138,6 +138,19 @@ leak:
   process_exit: true   # server must exit on stdin EOF within grace (3s)
 ```
 
+### SSRF probe (dynamic)
+
+```yaml
+probe:
+  ssrf: {hang_ms: 4000}
+```
+
+Starts a local honeyport, injects its URL into every string argument of
+every tool, and fails the suite naming each tool that made the server dial
+out — the SSRF surface static rules can only guess at. Verified against the
+official server-everything (17 tools, 0 hits) and a deliberately fetching
+fixture (hit reported as `fetch_url.url`).
+
 ## 中文
 
 `verax test` 用声明式 YAML 套件对真实 MCP server（stdio 拉起）做回归测试：断言/快照/延迟 SLO/进程泄漏/Schema 模糊测试一应俱全，终端 + JUnit XML + 单文件 HTML 三种报告，`--junit/--html` 落盘，GitHub Action 三行接入 CI。

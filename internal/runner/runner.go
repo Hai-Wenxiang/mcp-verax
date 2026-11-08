@@ -149,6 +149,14 @@ func RunSuite(s *dsl.Suite, opts Options) *SuiteReport {
 		if s.Fuzz != nil && s.Fuzz.Runs > 0 {
 			runFuzzBlock(s, opts, report)
 		}
+		if s.Probe != nil && s.Probe.SSRF != nil {
+			if cli, err := (&spawnOnce{grace: opts.CloseGraceMS}).get(s); err == nil {
+				runProbeIfConfigured(s, cli, report)
+				_ = cli.Close()
+			} else {
+				report.Cases = append(report.Cases, CaseResult{Name: "probe(ssrf)", Status: StatusError, Err: "start server: " + err.Error()})
+			}
+		}
 		if leakCheck {
 			report.Cases = append(report.Cases, leakCaseResult(servers, leaks))
 		}
@@ -180,6 +188,7 @@ func RunSuite(s *dsl.Suite, opts Options) *SuiteReport {
 		fres, err := runFuzzCampaign(shared, *s.Fuzz)
 		report.Cases = append(report.Cases, fuzzCaseResult(fres, err))
 	}
+	runProbeIfConfigured(s, shared, report)
 	_ = shared.Close()
 	if leakCheck {
 		leaks := 0
