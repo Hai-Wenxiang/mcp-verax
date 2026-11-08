@@ -13,19 +13,22 @@ import (
 	"strings"
 )
 
+// PulseRow is one scanned package in a pulse.
+type PulseRow struct {
+	Name     string      `json:"name"`
+	Package  string      `json:"package"`
+	Score    int         `json:"score"`
+	Findings interface{} `json:"findings"`
+	Error    string      `json:"error"`
+}
+
 // Pulse mirrors cmd/verax registry-pulse output.
 type Pulse struct {
-	Date     string `json:"date"`
-	Entries  int    `json:"entries_pulled"`
-	NpmTotal int    `json:"npm_packaged"`
-	Scanned  int    `json:"scanned"`
-	Rows     []struct {
-		Name     string      `json:"name"`
-		Package  string      `json:"package"`
-		Score    int         `json:"score"`
-		Findings interface{} `json:"findings"`
-		Error    string      `json:"error"`
-	} `json:"rows"`
+	Date     string     `json:"date"`
+	Entries  int        `json:"entries_pulled"`
+	NpmTotal int        `json:"npm_packaged"`
+	Scanned  int        `json:"scanned"`
+	Rows     []PulseRow `json:"rows"`
 }
 
 // LoadPulse reads one pulse file.
@@ -98,13 +101,7 @@ func Render(pulses []*Pulse) string {
 	}
 
 	for _, p := range pulses {
-		rows := append([]struct {
-			Name     string      `json:"name"`
-			Package  string      `json:"package"`
-			Score    int         `json:"score"`
-			Findings interface{} `json:"findings"`
-			Error    string      `json:"error"`
-		}(nil), p.Rows...)
+		rows := append([]PulseRow(nil), p.Rows...)
 		sort.SliceStable(rows, func(i, j int) bool {
 			if (rows[i].Error != "") != (rows[j].Error != "") {
 				return rows[i].Error == ""
@@ -130,14 +127,18 @@ func Render(pulses []*Pulse) string {
 			trendHTML := ""
 			if pts := trend[r.Package]; len(pts) > 1 {
 				parts := make([]string, len(pts))
+				scores := make([]int, len(pts))
 				for k, pt := range pts {
 					d, _ := pt[0].(string)
 					if len(d) > 5 {
 						d = d[5:] // "2026-11-08" → "11-08"
 					}
-					parts[k] = fmt.Sprintf("%s:%v", d, pt[1])
+					sc, _ := pt[1].(int)
+					scores[k] = sc
+					parts[k] = fmt.Sprintf("%s:%d", d, sc)
 				}
-				trendHTML = fmt.Sprintf(`<br><span class="trend">%s</span>`, strings.Join(parts, " → "))
+				trendHTML = fmt.Sprintf(`<br><svg class="spark" width="%d" height="14" title="%s">%s</svg>`,
+					len(scores)*14, strings.Join(parts, " → "), sparkline(scores))
 			}
 			fmt.Fprintf(&b, "<tr><td>%d</td><td>%s</td><td><code>%s</code>%s</td><td>%s</td></tr>\n",
 				i+1, r.Name, r.Package, trendHTML, scoreHTML)
@@ -150,6 +151,45 @@ func Render(pulses []*Pulse) string {
 </body>
 </html>`)
 	return b.String()
+}
+
+// sparkline renders score points (0-100) as a tiny polyline SVG.
+func sparkline(scores []int) string {
+	if len(scores) < 2 {
+		return ""
+	}
+	w := 14.0
+	var sb strings.Builder
+	for i, sc := range scores {
+		x := float64(i)*w + w/2
+		y := 13.0 - float64(sc)/100.0*11.0
+		fmt.Fprintf(&sb, `<circle cx="%.1f" cy="%.1f" r="1.6" fill="%s"/>`, x, y, sparkColor(sc))
+	}
+	first := true
+	for i := 1; i < len(scores); i++ {
+		_ = first
+		_ = i
+		break
+	}
+	// polyline through the points
+	var pts []string
+	for i, sc := range scores {
+		x := float64(i)*w + w/2
+		y := 13.0 - float64(sc)/100.0*11.0
+		pts = append(pts, fmt.Sprintf("%.1f,%.1f", x, y))
+	}
+	fmt.Fprintf(&sb, `<polyline points="%s" fill="none" stroke="#656d76" stroke-width="1"/>`, strings.Join(pts, " "))
+	return sb.String()
+}
+
+func sparkColor(score int) string {
+	switch {
+	case score >= 90:
+		return "#1a7f37"
+	case score >= 60:
+		return "#9a6700"
+	}
+	return "#cf222e"
 }
 
 // GenerateDir loads every pulse-*.json in dir (latest N by name) and writes

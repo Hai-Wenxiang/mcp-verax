@@ -3,7 +3,10 @@
 // findings, and reduces them to a 0–100 score.
 package scanner
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // Severity drives both reporting order and score weight.
 type Severity string
@@ -78,4 +81,20 @@ func (r *Result) CountsPerSeverity() map[Severity]int {
 		m[f.Severity]++
 	}
 	return m
+}
+
+// ParseSeverity maps a CLI severity name onto the scale; empty = low
+// (report anything). Unknown names are errors.
+func ParseSeverity(name string) (Severity, error) {
+	switch strings.ToLower(strings.TrimSpace(name)) {
+	case "", "low":
+		return SevLow, nil
+	case "medium":
+		return SevMedium, nil
+	case "high":
+		return SevHigh, nil
+	case "critical":
+		return SevCritical, nil
+	}
+	return "", fmt.Errorf("unknown severity %q (low|medium|high|critical)", name)
 }

@@ -9,13 +9,7 @@ import (
 
 func TestRenderSortsAndColors(t *testing.T) {
 	pulses := []*Pulse{
-		{Date: "2026-11-07", Entries: 30, NpmTotal: 2, Scanned: 2, Rows: []struct {
-			Name     string      `json:"name"`
-			Package  string      `json:"package"`
-			Score    int         `json:"score"`
-			Findings interface{} `json:"findings"`
-			Error    string      `json:"error"`
-		}{
+		{Date: "2026-11-07", Entries: 30, NpmTotal: 2, Scanned: 2, Rows: []PulseRow{
 			{Name: "low-one", Package: "low@1.0.0", Score: 30},
 			{Name: "high-one", Package: "high@1.0.0", Score: 95},
 			{Name: "broken", Package: "broken@1.0.0", Error: "fetch failed"},
@@ -65,39 +59,30 @@ func TestGenerateDir(t *testing.T) {
 }
 
 func TestRenderTrendAcrossDates(t *testing.T) {
-	rowA := func(score int) struct {
-		Name     string      `json:"name"`
-		Package  string      `json:"package"`
-		Score    int         `json:"score"`
-		Findings interface{} `json:"findings"`
-		Error    string      `json:"error"`
-	} {
-		return struct {
-			Name     string      `json:"name"`
-			Package  string      `json:"package"`
-			Score    int         `json:"score"`
-			Findings interface{} `json:"findings"`
-			Error    string      `json:"error"`
-		}{Name: "a", Package: "a@1.0.0", Score: score}
+	rowA := func(score int) PulseRow {
+		return PulseRow{Name: "a", Package: "a@1.0.0", Score: score}
 	}
 	pulses := []*Pulse{
-		{Date: "2026-11-01", Rows: []struct {
-			Name     string      `json:"name"`
-			Package  string      `json:"package"`
-			Score    int         `json:"score"`
-			Findings interface{} `json:"findings"`
-			Error    string      `json:"error"`
-		}{rowA(70)}},
-		{Date: "2026-11-08", Rows: []struct {
-			Name     string      `json:"name"`
-			Package  string      `json:"package"`
-			Score    int         `json:"score"`
-			Findings interface{} `json:"findings"`
-			Error    string      `json:"error"`
-		}{rowA(88)}},
+		{Date: "2026-11-01", Rows: []PulseRow{rowA(70)}},
+		{Date: "2026-11-08", Rows: []PulseRow{rowA(95)}},
 	}
 	html := Render(pulses)
-	if !strings.Contains(html, "11-01:70 → 11-08:88") {
+	if !strings.Contains(html, "11-01:70 → 11-08:95") {
 		t.Errorf("trend line missing:\n%s", html)
+	}
+}
+
+func TestSparklineRenders(t *testing.T) {
+	row := func(score int) PulseRow {
+		return PulseRow{Name: "a", Package: "a@1", Score: score}
+	}
+	html := Render([]*Pulse{
+		{Date: "2026-11-01", Rows: []PulseRow{row(70)}},
+		{Date: "2026-11-08", Rows: []PulseRow{row(95)}},
+	})
+	for _, want := range []string{`<svg class="spark"`, `<polyline points=`, `fill="#1a7f37"`, `title="11-01:70 → 11-08:95"`} {
+		if !strings.Contains(html, want) {
+			t.Errorf("sparkline missing %q", want)
+		}
 	}
 }

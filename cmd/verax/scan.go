@@ -17,6 +17,7 @@ func runScan(args []string, stdout, stderr io.Writer) int {
 	sarifPath := fs.String("sarif", "", "write a SARIF 2.1.0 report to this path")
 	noOSV := fs.Bool("no-osv", false, "skip dependency CVE enrichment (osv.dev)")
 	minScore := fs.Int("min-score", 0, "exit 1 when the score drops below this threshold (0-100)")
+	failLevel := fs.String("fail-level", "", "exit 1 when findings at/above this severity exist: low|medium|high|critical")
 	badgePath := fs.String("badge", "", "write a shields-style SVG score badge to this path")
 	jsonPath := fs.String("json", "", "write full machine-readable JSON to this path")
 	if err := fs.Parse(reorderFlags(args)); err != nil {
@@ -110,8 +111,15 @@ func runScan(args []string, stdout, stderr io.Writer) int {
 	}
 
 	counts := res.CountsPerSeverity()
-	if counts[scanner.SevCritical] > 0 || counts[scanner.SevHigh] > 0 {
-		return 1
+	threshold, err := scanner.ParseSeverity(*failLevel)
+	if err != nil {
+		fmt.Fprintf(stderr, "verax scan: %v\n", err)
+		return 2
+	}
+	for sev, n := range counts {
+		if n > 0 && sev.Weight() >= threshold.Weight() {
+			return 1
+		}
 	}
 	if *minScore > 0 && res.Score() < *minScore {
 		fmt.Fprintf(stderr, "verax scan: score %d below --min-score %d\n", res.Score(), *minScore)
