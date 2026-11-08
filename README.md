@@ -44,6 +44,13 @@ self-scan 100/100 — the flywheel (template → suite-green → scan-clean) run
 
 Verax 围绕一个理念构建：MCP server 应当能**自证**协议合规、稳定与安全，而使用者应当能在 CI 里低成本地验证这个说法。
 
+```bash
+verax init tests/x.suite.yaml -- npx -y "@scope/mcp-server"   # 活 server 生成起始套件（开箱即绿）
+verax test tests/x.suite.yaml --repeat 10 -j 4                # 断言/探针/SLO/泄漏/fuzz + 稳定性
+verax scan @scope/mcp-server --badge b.svg --min-score 90      # 规则+CVE 评分门禁 + 徽章
+verax new csv-query my-server                                 # 零依赖模板脚手架（套件绿、自扫满分）
+```
+
 **规划组件（M1 → M4）：**
 
 | 组件 | 作用 | 状态 |
