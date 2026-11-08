@@ -116,6 +116,7 @@ func RunSuite(s *dsl.Suite, opts Options) *SuiteReport {
 			report.Cases = append(report.Cases, runCase(cli, c, store, opts))
 			_ = cli.Close()
 		}
+		runSLOIfConfigured(s, &spawnOnce{}, report)
 		return report
 	}
 
@@ -133,7 +134,49 @@ func RunSuite(s *dsl.Suite, opts Options) *SuiteReport {
 		}
 		report.Cases = append(report.Cases, res)
 	}
+	if s.SLO != nil && s.SLO.Tool != "" {
+		res := runSLO(shared, *s.SLO)
+		report.Cases = append(report.Cases, CaseResult{
+			Name:   "slo(" + s.SLO.Tool + ")",
+			Status: statusFromChecks(res.Checks()),
+			Checks: res.Checks(),
+		})
+	}
 	return report
+}
+
+// spawnOnce abstracts "give me a client for SLO" in respawn mode.
+type spawnOnce struct {
+	cli *mcpclient.Client
+	err error
+}
+
+func (so *spawnOnce) get(s *dsl.Suite) (*mcpclient.Client, error) {
+	if so.cli != nil || so.err != nil {
+		return so.cli, so.err
+	}
+	so.cli, so.err = spawn(s, nil)
+	return so.cli, so.err
+}
+
+func runSLOIfConfigured(s *dsl.Suite, so *spawnOnce, report *SuiteReport) {
+	if s.SLO == nil || s.SLO.Tool == "" {
+		return
+	}
+	cli, err := so.get(s)
+	if err != nil {
+		report.Cases = append(report.Cases, CaseResult{
+			Name: "slo(" + s.SLO.Tool + ")", Status: StatusError, Err: "start server: " + err.Error(),
+		})
+		return
+	}
+	defer func() { _ = cli.Close() }()
+	res := runSLO(cli, *s.SLO)
+	report.Cases = append(report.Cases, CaseResult{
+		Name:   "slo(" + s.SLO.Tool + ")",
+		Status: statusFromChecks(res.Checks()),
+		Checks: res.Checks(),
+	})
 }
 
 func spawn(s *dsl.Suite, extraEnv map[string]string) (*mcpclient.Client, error) {

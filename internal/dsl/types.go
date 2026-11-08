@@ -76,12 +76,15 @@ type ExpectBlock struct {
 	ResultSnapshot string   `yaml:"result.snapshot"`
 }
 
-// SLO are latency/stability budgets.
+// SLO are latency/stability budgets measured against repeated tool calls.
+// Defaults applied by the runner: sample_calls=20, concurrency=1 when unset.
 type SLO struct {
-	P95CallMS   int     `yaml:"p95_call_ms"`
-	Concurrency int     `yaml:"concurrency"`
-	SuccessRate float64 `yaml:"success_rate"`
-	SampleCalls int     `yaml:"sample_calls"`
+	Tool        string         `yaml:"tool"`
+	Args        map[string]any `yaml:"args"`
+	P95CallMS   int            `yaml:"p95_call_ms"`
+	Concurrency int            `yaml:"concurrency"`
+	SuccessRate float64        `yaml:"success_rate"`
+	SampleCalls int            `yaml:"sample_calls"`
 }
 
 // Fuzz configures schema-driven fuzzing.
@@ -169,8 +172,8 @@ func (s *Suite) Validate() error {
 		if s.SLO.SampleCalls < 0 {
 			problems = append(problems, "slo.sample_calls: must be >= 0")
 		}
-		if s.SLO.P95CallMS > 0 && s.SLO.SampleCalls == 0 {
-			problems = append(problems, "slo: sample_calls required when p95_call_ms is set (default 20)")
+		if s.SLO.Tool == "" && (s.SLO.SampleCalls > 0 || s.SLO.P95CallMS > 0 || s.SLO.SuccessRate > 0) {
+			problems = append(problems, "slo.tool: required when any SLO budget is set")
 		}
 	}
 

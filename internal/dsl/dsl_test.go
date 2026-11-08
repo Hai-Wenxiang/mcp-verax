@@ -30,6 +30,8 @@ case:
       result.contains: ["hello verax"]
       result.snapshot: echo-basic
 slo:
+  tool: echo
+  args: {msg: "slo sample"}
   p95_call_ms: 800
   concurrency: 5
   success_rate: 1.0
@@ -97,7 +99,7 @@ case:
 slo:
   success_rate: 2.0
   p95_call_ms: 100
-  sample_calls: 0
+  sample_calls: 5
 `
 	_, err := Parse([]byte(bad), "bad.yaml")
 	if err == nil {
@@ -110,7 +112,7 @@ slo:
 		"discovery assertions",
 		"case[1]", // name required reported at index
 		"success_rate",
-		"sample_calls",
+		"slo.tool: required",
 	} {
 		if !strings.Contains(msg, want) {
 			t.Errorf("error missing %q:\n%s", want, msg)
