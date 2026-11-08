@@ -16,6 +16,8 @@ mcp-scan-style malicious-content detection.
 verax scan ./my-mcp-server                     # local project
 verax scan @scope/mcp-server                   # published artifact (npm pack)
 verax scan @scope/mcp-server --sarif out.json  # SARIF 2.1.0 for GitHub Security tab
+verax scan . --fail-level medium          # exit 1 when findings reach a severity
+verax scan . --badge b.svg --min-score 90 # SVG badge + score threshold
 ```
 
 Exit codes: `0` clean / low-only · `1` any critical or high · `2` usage.
