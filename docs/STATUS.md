@@ -83,3 +83,6 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 | S13 Streamable HTTP transport for test suites | ✅ Done | POST subset (JSON+SSE), fixture HTTP mode, url-target e2e green |
 
 - 2026-11-08 (evening 3): Mcp-Session-Id echo; --json report; CI real-package scan (F-4: official server-memory, 6 advisories).
+
+- 2026-11-08 — **v0.4.0 released**: session-echo, --json/--badge/--repeat,
+  real-package CI scan (F-4: official server-memory, 6 advisories).
