@@ -66,6 +66,7 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 | Feature | Status | Notes |
 |---|---|---|
 | filesystem-safe template (first of the library) | ✅ Done | zero-dep Node, root containment; suite 5/5, self-scan 100/100 |
+| csv-query template | ✅ Done | zero-dep, caps + containment; suite 7/7, self-scan 100/100 |
 | next templates (rest-api-wrap, db-readonly, …) | ⬜ Next | |
 
 ## M1 addendum: HTTP targets (2026-11-08 evening)

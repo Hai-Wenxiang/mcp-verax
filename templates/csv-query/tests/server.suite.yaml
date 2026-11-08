@@ -1,0 +1,44 @@
+# Embedded Verax suite for the csv-query template.
+# Run from the repo root:  verax test templates/csv-query/tests/server.suite.yaml
+suite: csv-query-template
+target:
+  command: node templates/csv-query/index.js
+  env:
+    VERAX_ROOT: templates/csv-query/data
+  timeout_startup_ms: 20000
+case:
+  - name: tool catalogue
+    expect:
+      tools.list.includes: [list_csv, describe_csv, query_csv]
+      tools.list.schema_valid: true
+  - name: list finds the sample csv
+    call: list_csv
+    expect:
+      ok: true
+      result.contains: ["people.csv"]
+  - name: describe reports columns
+    call: describe_csv
+    args: {path: "people.csv"}
+    expect:
+      ok: true
+      result.contains: ["name", "city"]
+  - name: query filters by column
+    call: query_csv
+    args: {path: "people.csv", column: "city", contains: "Shanghai"}
+    expect:
+      ok: true
+      result.contains: ["Wei"]
+  - name: unknown column rejected
+    call: query_csv
+    args: {path: "people.csv", column: "no_such_col"}
+    expect:
+      is_error: true
+      error.contains: "unknown column"
+  - name: path escape rejected
+    call: describe_csv
+    args: {path: "../../go.mod"}
+    expect:
+      is_error: true
+      error.contains: "escapes allowed root"
+leak:
+  process_exit: true

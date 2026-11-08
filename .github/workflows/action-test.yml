@@ -55,3 +55,9 @@ jobs:
         with:
           mode: test
           files: templates/filesystem-safe/tests/server.suite.yaml
+
+      - name: Test the csv-query template via composite action
+        uses: ./
+        with:
+          mode: test
+          files: templates/csv-query/tests/server.suite.yaml
