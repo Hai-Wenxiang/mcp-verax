@@ -1,0 +1,42 @@
+name: registry-pulse
+
+# Registry Intelligence v0: nightly pull of the official MCP registry,
+# scan a sample of npm-packaged entries, commit the pulse report.
+
+on:
+  schedule:
+    - cron: '17 20 * * *'   # 04:17 Beijing, daily
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  pulse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: false
+
+      - name: Run registry pulse (5 pages, 15 packages)
+        run: |
+          go run ./cmd/verax registry-pulse \
+            --pages 5 --sample 15 \
+            --out docs/registry \
+            --http-timeout 60s
+
+      - name: Commit pulse report
+        run: |
+          git config user.name "verax-pulse-bot"
+          git config user.email "56026094+Hai-Wenxiang@users.noreply.github.com"
+          git add docs/registry/ || true
+          if git diff --cached --quiet; then
+            echo "no pulse changes"
+            exit 0
+          fi
+          git commit -m "chore(registry): pulse $(date -u +%F) [skip ci]"
+          git push

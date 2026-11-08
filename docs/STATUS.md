@@ -31,7 +31,9 @@
 | S7 Privacy/outbound rules (PRV-301, SEC-002, SEC-008) | ✅ Done | e2e found everything's url-elicitation surface |
 | S8 Action scan mode + self-test job | ✅ Done | mode: scan with sarif artifact upload |
 | S9 Language-aware rule dispatch + Python pack + JS QUA/PRV | ✅ Done | 16 rules total (js+py+pkg) |
-| S10+ Dynamic probes (VX-DYN), deps CVE (OSV), badge service | ⬜ Next | |
+| deps CVE (OSV) + per-advisory severity | ✅ Done | S10/S11, best-effort refinement |
+| **Registry Intelligence v0 (`verax registry-pulse`)** | ✅ Done | live official registry pull → sample scans → JSON+MD; nightly workflow; first live pulse: 2 npm pkgs (88, 95); DI-default false-positive class found & fixed via live data |
+| badge service (Worker), M4 leaderboard | ⬜ Next | |
 
 Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 

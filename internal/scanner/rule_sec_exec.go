@@ -35,6 +35,12 @@ func bareEnvRef(content string, end int) bool {
 // object), so the previous few lines count as context.
 var envInheritanceRe = regexp.MustCompile(`\b(spawn|spawnSync|execFile|fork|exec)\s*\(`)
 
+// envDefaultParam matches the DI idiom `func(env = process.env, ...)` —
+// `process.environment` et al. excluded via the negated word char.
+var envDefaultParamRe = regexp.MustCompile(`=\s*process\.env[^a-zA-Z0-9_]`)
+
+func envDefaultParam(snip string) bool { return envDefaultParamRe.MatchString(snip) }
+
 func envInheritanceContext(content string, at int, snip string) bool {
 	if envInheritanceRe.MatchString(snip) {
 		return true
@@ -70,6 +76,15 @@ var secEnvDump = sourceRule{
 			}
 			if envInheritanceContext(content, loc[0], snip) {
 				continue // ...process.env into a child spawn: inheritance, not exposure
+			}
+			if envDefaultParam(snip) {
+				out = append(out, Finding{
+					RuleID: "VX-SEC-001", Title: "env dependency-injection default (review outputs)",
+					Severity: SevMedium, File: rel, Line: lineOf(content, loc[0]),
+					Snippet: snip,
+					Why:     "process.env is the default argument — fine for testing, but verify the function never returns env contents to tool callers",
+				})
+				continue
 			}
 			out = append(out, Finding{
 				RuleID: "VX-SEC-001", Title: "whole-environment exposure (bare process.env)",

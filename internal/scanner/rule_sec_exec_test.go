@@ -59,3 +59,27 @@ func TestCleanFixtureNoExecOrEnvFindings(t *testing.T) {
 		}
 	}
 }
+
+func TestEnvDefaultParamIsMediumNotCritical(t *testing.T) {
+	// found via live registry pulse: `agencies(env = process.env)` DI idiom
+	content := "export function agencies(env = process.env) {\n  return list;\n}\nexport function dump() {\n  return JSON.stringify(process.env);\n}\n"
+	got := secEnvDump.Check("di.js", content)
+	if len(got) != 2 {
+		t.Fatalf("want 2 findings (DI + exposure), got %d: %+v", len(got), got)
+	}
+	var di, exposure *Finding
+	for i := range got {
+		if got[i].Title == "env dependency-injection default (review outputs)" {
+			di = &got[i]
+		}
+		if got[i].Severity == SevCritical {
+			exposure = &got[i]
+		}
+	}
+	if di == nil || di.Severity != SevMedium {
+		t.Errorf("DI default must be medium with distinct title: %+v", di)
+	}
+	if exposure == nil {
+		t.Error("raw stringify exposure must stay critical")
+	}
+}
