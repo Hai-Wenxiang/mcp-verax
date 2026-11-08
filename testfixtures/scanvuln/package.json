@@ -1,0 +1,10 @@
+{
+  "name": "scanvuln-fixture",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {}
+}
