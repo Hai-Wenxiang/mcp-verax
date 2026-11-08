@@ -127,3 +127,5 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 - 2026-11-08 (final): leaderboard LIVE on Pages; pulse -j concurrent;
   wider live sample surfaced a 0/100 package (ai.adeu/adeu — shell-built
   URL opens + uncontained credential writes; see docs/registry).
+
+- 2026-11-08 (overtime): community corpus + pulse --all. **v0.8.0 released**.

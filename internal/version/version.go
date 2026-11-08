@@ -5,7 +5,7 @@ import "regexp"
 
 // Version is the semantic version of the verax CLI. It is overridden at
 // build time via -ldflags "-X github.com/Hai-Wenxiang/mcp-verax/internal/version.Version=x.y.z".
-var Version = "0.7.0"
+var Version = "0.8.0"
 
 // semverRe matches loose semantic versions (major.minor.patch with optional
 // pre-release/build suffixes).
