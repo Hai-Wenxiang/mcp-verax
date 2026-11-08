@@ -2,6 +2,15 @@
 
 All notable changes. Dates are 2026-11-08 (initial development day).
 
+## v0.9.0
+- `verax report`: pulse data → ecosystem report (markdown + self-contained
+  HTML) — score distribution, severity mix, most prevalent rules, riskiest
+  packages, per-package trend (keys survive version bumps)
+- Wired into the nightly loop (regenerated after each pulse, published to
+  Pages, cross-linked with the leaderboard)
+- First live edition (2026-11-08 pulse): 29 packages, mean 83.6, top
+  ecosystem risk VX-SEC-008 (107 hits)
+
 ## v0.8.1
 - Weekly full-registry walk: Monday 05:33 Beijing cron + `full-walk`
   workflow dispatch input (150-pkg sample, `--max-pages` bounded)

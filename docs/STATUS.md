@@ -46,7 +46,8 @@
 | weekly full-walk schedule | ✅ Done | Mon 05:33 Beijing cron + `full-walk` dispatch input; 150-pkg sample |
 | nightly loop closes itself | ✅ Done | pulse → leaderboard regen → badge smoke → commit → Pages deploy trigger; page-fetch retry 3× linear backoff; pulse-latest.json auto-written |
 | corpus categories sql/json-rpc/xss | ✅ Done | 3 new files, 8 categories total |
-| next: quarterly ecosystem report | ⬜ Next | |
+| ecosystem report (`verax report`) | ✅ Done | pulses → score bands, severity mix, top rules, riskiest pkgs, trend (version-bump-safe keys); md + html into nightly loop |
+| next: scanner Rust language pack | ⬜ Next | |
 
 Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 
@@ -56,7 +57,7 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 |---|---|---|
 | Verax Scanner (security/quality/privacy rule packs, SARIF, score) | M2 | ✅ Shipped (16 rules, osv CVEs, gates) |
 | Verax Templates (TS + Python scaffolds) | M3 | 🚧 6 templates shipped with `verax new`; productization next |
-| Verax Registry Intelligence (mirror, leaderboard, quarterly report) | M4 | 🚧 Nightly pulse + live leaderboard + badges; quarterly report next |
+| Verax Registry Intelligence (mirror, leaderboard, quarterly report) | M4 | 🚧 Nightly pulse + live leaderboard + badges + ecosystem report; quarterly edition when data spans quarters |
 | MCP gateway | — | ⏸ Evaluated, deferred (crowded space; see research docs) |
 
 ## Changelog / 变更日志
