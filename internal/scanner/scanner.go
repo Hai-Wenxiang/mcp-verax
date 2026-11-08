@@ -26,9 +26,13 @@ type TargetKind int
 const (
 	TargetLocal TargetKind = iota
 	TargetNpm              // npm package spec — fetched via `npm pack`
+	TargetCrate            // crate:name[@version] — fetched from crates.io
 )
 
 func ResolveTarget(target string) (TargetKind, error) {
+	if strings.HasPrefix(target, "crate:") {
+		return TargetCrate, nil
+	}
 	if st, err := os.Stat(target); err == nil && st.IsDir() {
 		return TargetLocal, nil
 	}

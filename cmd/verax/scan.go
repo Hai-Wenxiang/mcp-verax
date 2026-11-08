@@ -25,8 +25,8 @@ func runScan(args []string, stdout, stderr io.Writer) int {
 	}
 	targets := fs.Args()
 	if len(targets) != 1 {
-		fmt.Fprintln(stderr, "verax scan: exactly one target required (local directory or npm package spec)")
-		fmt.Fprintln(stderr, "usage: verax scan [--sarif out.json] <dir | @scope/pkg | pkg@version>")
+		fmt.Fprintln(stderr, "verax scan: exactly one target required (local directory, npm package spec or crate)")
+		fmt.Fprintln(stderr, "usage: verax scan [--sarif out.json] <dir | @scope/pkg | pkg@version | crate:name[@version]>")
 		return 2
 	}
 	target := targets[0]
@@ -41,6 +41,16 @@ func runScan(args []string, stdout, stderr io.Writer) int {
 	switch kind {
 	case scanner.TargetLocal:
 		res, err = scanner.Scan(target, target)
+	case scanner.TargetCrate:
+		var root string
+		var cleanup func()
+		root, cleanup, err = scanner.FetchCratePackage(target)
+		if err != nil {
+			fmt.Fprintf(stderr, "verax scan: %v\n", err)
+			return 1
+		}
+		defer cleanup()
+		res, err = scanner.Scan(root, target)
 	default: // TargetNpm
 		var root string
 		var cleanup func()

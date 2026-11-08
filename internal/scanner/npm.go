@@ -78,6 +78,12 @@ func firstPackFilename(out []byte) string {
 // extractTarGz unpacks a gzipped tarball, stripping any leading "package/"
 // component (npm layout) and rejecting path escapes.
 func extractTarGz(tgzPath, dest string) error {
+	return extractTarGzStrip(tgzPath, dest, "package/")
+}
+
+// extractTarGzStrip is extractTarGz with a configurable leading directory
+// to strip (npm: "package/", crates.io: "{name}-{version}/").
+func extractTarGzStrip(tgzPath, dest, strip string) error {
 	f, err := os.Open(tgzPath)
 	if err != nil {
 		return err
@@ -90,6 +96,7 @@ func extractTarGz(tgzPath, dest string) error {
 	}
 	defer gz.Close()
 
+	topDir := strings.TrimSuffix(strip, "/")
 	tr := tar.NewReader(gz)
 	for {
 		hdr, err := tr.Next()
@@ -100,10 +107,10 @@ func extractTarGz(tgzPath, dest string) error {
 			return fmt.Errorf("scanner: tar read: %w", err)
 		}
 		name := path.Clean(hdr.Name)
-		if name == "package" || name == "." || name == "/" {
+		if name == topDir || name == "." || name == "/" {
 			continue // top-level layout directory
 		}
-		name = strings.TrimPrefix(name, "package/")
+		name = strings.TrimPrefix(name, strip)
 		if name == "" || name == "." {
 			continue
 		}
