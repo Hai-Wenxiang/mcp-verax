@@ -6,7 +6,7 @@
 ## English
 
 `verax scan` statically inspects an MCP server **as published** — a local
-project directory or an npm package spec — and reduces findings to a 0–100
+project directory, an npm package spec or a crates.io crate (`crate:name[@version]`) — and reduces findings to a 0–100
 score. It answers "is this server worth installing?", complementing
 mcp-scan-style malicious-content detection.
 
@@ -15,6 +15,7 @@ mcp-scan-style malicious-content detection.
 ```bash
 verax scan ./my-mcp-server                     # local project
 verax scan @scope/mcp-server                   # published artifact (npm pack)
+verax scan crate:tinyjson                       # published artifact (crates.io)
 verax scan @scope/mcp-server --sarif out.json  # SARIF 2.1.0 for GitHub Security tab
 verax scan . --fail-level medium          # exit 1 when findings reach a severity
 verax scan . --badge b.svg --min-score 90 # SVG badge + score threshold

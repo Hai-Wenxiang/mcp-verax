@@ -48,7 +48,8 @@
 | corpus categories sql/json-rpc/xss | ✅ Done | 3 new files, 8 categories total |
 | ecosystem report (`verax report`) | ✅ Done | pulses → score bands, severity mix, top rules, riskiest pkgs, trend (version-bump-safe keys); md + html into nightly loop |
 | Rust rule pack (rs) | ✅ Done | 6 source rules (SEC-003/002/008/014, QUA-107, PRV-303) + Cargo.toml meta; 18 rules total (js/py/rs/pkg); scanrust e2e fixture in CI |
-| next: scanner Rust targets from crates.io (`verax scan crate:`) | ⬜ Next | |
+| crates.io scan targets (`crate:`) | ✅ Done | pure-HTTP fetch (identifying UA per crates.io policy), version resolve, crate-root strip, escape-proof tar reuse; live: tinyjson 2.5.1 → 88/100; real-crate scan in action self-test |
+| next: registry-pulse crate-packaged entries | ⬜ Next | official registry lists crates.io packages too |
 
 Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 

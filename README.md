@@ -20,6 +20,7 @@ Verax is a toolkit built around one idea: an MCP server should be able to **prov
 verax test your-server.suite.yaml --html report.html   # suites: assertions, SLO, fuzz, SSRF probe
 verax test your-server.suite.yaml --repeat 10          # flake detection: per-case stability
 verax scan @scope/mcp-server --badge badge.svg         # score a published package (osv CVEs incl.)
+verax scan crate:rmcp --min-score 80                    # crates.io artifacts too
 ```
 
 **Field evidence** (2026-11-08): scanning the *official* `@modelcontextprotocol/server-memory`
@@ -48,6 +49,7 @@ Verax 围绕一个理念构建：MCP server 应当能**自证**协议合规、�
 verax init tests/x.suite.yaml -- npx -y "@scope/mcp-server"   # 活 server 生成起始套件（开箱即绿）
 verax test tests/x.suite.yaml --repeat 10 -j 4                # 断言/探针/SLO/泄漏/fuzz + 稳定性
 verax scan @scope/mcp-server --badge b.svg --min-score 90      # 规则+CVE 评分门禁 + 徽章
+verax scan crate:rmcp --min-score 80                    # crates.io 目标同样支持
 verax new csv-query my-server                                 # 零依赖模板脚手架（套件绿、自扫满分）
 ```
 

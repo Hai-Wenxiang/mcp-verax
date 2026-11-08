@@ -2,6 +2,13 @@
 
 All notable changes. Dates are 2026-11-08 (initial development day).
 
+## v0.11.0
+- `verax scan crate:name[@version]`: scan published crates.io artifacts —
+  pure-HTTP fetch with an identifying User-Agent (crates.io policy),
+  latest-version resolution, crate-root-stripping extraction reusing the
+  escape-proof tar reader
+- Action self-test now scans a real pinned crate (`tinyjson@2.5.1`)
+
 ## v0.10.0
 - Rust rule pack: `verax scan` understands Rust projects (Cargo.toml +
   .rs) — 6 new source rules (VX-SEC-003 dynamic/shell spawn, VX-SEC-002
