@@ -1,0 +1,20 @@
+{
+  "name": "notes-store-template",
+  "version": "0.1.0",
+  "description": "Verax template: contained notes store with size caps, zero dependencies.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hai-Wenxiang/mcp-verax"
+  },
+  "type": "module",
+  "bin": { "notes-store": "./index.js" },
+  "verax-template": {
+    "id": "notes-store",
+    "variables": [
+      { "name": "VERAX_ROOT", "desc": "allowed root directory", "default": "./data" },
+      { "name": "VERAX_MAX_NOTES", "desc": "note count cap", "default": "1000" },
+      { "name": "VERAX_MAX_NOTE_BYTES", "desc": "per-note size cap", "default": "65536" }
+    ]
+  }
+}

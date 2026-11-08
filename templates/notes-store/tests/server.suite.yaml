@@ -1,0 +1,49 @@
+# Embedded Verax suite for the notes-store template.
+# Run from the repo root:  verax test templates/notes-store/tests/server.suite.yaml
+suite: notes-store-template
+target:
+  command: node templates/notes-store/index.js
+  env:
+    VERAX_ROOT: templates/notes-store/data
+  timeout_startup_ms: 20000
+case:
+  - name: tool catalogue
+    expect:
+      tools.list.includes: [list_notes, read_note, write_note, delete_note]
+      tools.list.schema_valid: true
+  - name: write a note
+    call: write_note
+    args: {id: "welcome", content: "hello from notes-store template"}
+    expect:
+      ok: true
+      result.contains: ["created welcome"]
+  - name: read it back
+    call: read_note
+    args: {id: "welcome"}
+    expect:
+      ok: true
+      result.contains: ["hello from notes-store template"]
+  - name: list shows the note
+    call: list_notes
+    expect:
+      ok: true
+      result.contains: ["welcome"]
+  - name: delete it
+    call: delete_note
+    args: {id: "welcome"}
+    expect:
+      ok: true
+      result.contains: ["deleted welcome"]
+  - name: path-trick id rejected
+    call: read_note
+    args: {id: "../go.mod"}
+    expect:
+      is_error: true
+      error.contains: "invalid note id"
+  - name: unknown note is a clean error
+    call: read_note
+    args: {id: "missing-note"}
+    expect:
+      is_error: true
+leak:
+  process_exit: true

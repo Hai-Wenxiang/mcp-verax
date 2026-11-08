@@ -67,6 +67,8 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 |---|---|---|
 | filesystem-safe template (first of the library) | ✅ Done | zero-dep Node, root containment; suite 5/5, self-scan 100/100 |
 | csv-query template | ✅ Done | zero-dep, caps + containment; suite 7/7, self-scan 100/100 |
+| notes-store template | ✅ Done | zero-dep CRUD, id sanitize + caps; suite 8/8, self-scan 100/100 |
+| `verax new` scaffolder | ✅ Done | templates embedded in binary; scaffold→cd→suite e2e green |
 | next templates (rest-api-wrap, db-readonly, …) | ⬜ Next | |
 
 ## M1 addendum: HTTP targets (2026-11-08 evening)

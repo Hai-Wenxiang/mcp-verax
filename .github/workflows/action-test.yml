@@ -61,3 +61,9 @@ jobs:
         with:
           mode: test
           files: templates/csv-query/tests/server.suite.yaml
+
+      - name: Test the notes-store template via composite action
+        uses: ./
+        with:
+          mode: test
+          files: templates/notes-store/tests/server.suite.yaml
