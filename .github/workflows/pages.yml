@@ -1,0 +1,51 @@
+name: pages
+
+# Publishes the registry leaderboard (docs/registry/index.html, kept fresh by
+# the nightly registry-pulse workflow) to GitHub Pages.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/registry/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # pulse data + leaderboard as-is; index.html is the landing page
+      - name: Assemble site
+        run: |
+          mkdir -p /tmp/site
+          cp -r docs/registry/* /tmp/site/ 2>/dev/null || true
+          # ensure a landing page exists even before the first pulse
+          if [ ! -f /tmp/site/index.html ]; then
+            cat > /tmp/site/index.html <<'EOF'
+          <!doctype html><meta charset="utf-8"><title>Verax Registry Leaderboard</title>
+          <p>First registry pulse hasn't run yet — the leaderboard appears after the next nightly run.</p>
+          EOF
+          fi
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: /tmp/site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
