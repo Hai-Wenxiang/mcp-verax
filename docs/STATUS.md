@@ -39,6 +39,8 @@
 | concurrent pulse scans (-j) | ✅ Done | 4 pages→6 pkgs in one run; nightly bumped to 10 pages/30 pkgs/-j 6 |
 | leaderboard trend lines | ✅ Done | per-package date:score series, oldest→newest, grows with nightly pulses |
 | pulse retry/backoff | ✅ Done | 3 attempts, linear backoff — live registry TLS flakiness hardened |
+| `verax scan --fail-level` gate | ✅ Done | severity-threshold exit (low/medium/high/critical), e2e verified |
+| leaderboard sparklines | ✅ Done | inline SVG score dots+polyline per package (grows from 2nd pulse) |
 | next: full-registry sampling | ⬜ Next | |
 
 Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred

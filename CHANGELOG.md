@@ -2,6 +2,10 @@
 
 All notable changes. Dates are 2026-11-08 (initial development day).
 
+## Unreleased (post-v0.7.0)
+- `verax scan --fail-level low|medium|high|critical` severity gate
+- Leaderboard: trend sparklines (SVG), pulse retry/backoff, Pages live
+
 ## v0.7.0
 - `apps/badge`: badge service over pulse data (SVG, healthz, hourly reload)
 - `apps/leaderboard` + `verax leaderboard`: pulses → static self-contained
