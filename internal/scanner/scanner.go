@@ -24,10 +24,11 @@ var sourceExts = map[string]bool{
 type TargetKind int
 
 const (
-	TargetLocal TargetKind = iota
-	TargetNpm              // npm package spec — fetched via `npm pack`
-	TargetCrate            // crate:name[@version] — fetched from crates.io
-	TargetPyPI             // pypi:name[@version] — fetched from PyPI
+	TargetLocal  TargetKind = iota
+	TargetNpm               // npm package spec — fetched via `npm pack`
+	TargetCrate             // crate:name[@version] — fetched from crates.io
+	TargetPyPI              // pypi:name[@version] — fetched from PyPI
+	TargetGithub            // gh:owner/repo[@ref] — fetched from codeload
 )
 
 func ResolveTarget(target string) (TargetKind, error) {
@@ -36,6 +37,9 @@ func ResolveTarget(target string) (TargetKind, error) {
 	}
 	if strings.HasPrefix(target, "pypi:") {
 		return TargetPyPI, nil
+	}
+	if strings.HasPrefix(target, "gh:") {
+		return TargetGithub, nil
 	}
 	if st, err := os.Stat(target); err == nil && st.IsDir() {
 		return TargetLocal, nil
