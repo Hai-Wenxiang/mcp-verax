@@ -36,6 +36,8 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return runTest(args[1:], stdout, stderr)
 	case "scan":
 		return runScan(args[1:], stdout, stderr)
+	case "rules":
+		return runRules(args[1:], stdout, stderr)
 	default:
 		fmt.Fprintf(stderr, "verax: unknown command %q\n\n", args[0])
 		usage(stderr)
