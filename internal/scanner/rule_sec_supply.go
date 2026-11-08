@@ -6,9 +6,11 @@ func init() {
 	packageRules = append(packageRules, secInstallScripts, secTyposquat)
 }
 
-// installHooks run code when the CONSUMER installs the package — the classic
-// supply-chain execution point.
-var installHooks = []string{"preinstall", "install", "postinstall", "prepare"}
+// installHooks run code when the CONSUMER installs the package from the
+// registry — the classic supply-chain execution point. ("prepare" is
+// deliberately excluded: it runs on dev/git installs, not consumer installs,
+// and is overwhelmingly `npm run build` — found via real-package e2e.)
+var installHooks = []string{"preinstall", "install", "postinstall"}
 
 // secInstallScripts (VX-SEC-012): lifecycle scripts that execute at install
 // time on every consumer machine.

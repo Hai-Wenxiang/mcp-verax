@@ -34,6 +34,8 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return 0
 	case "test":
 		return runTest(args[1:], stdout, stderr)
+	case "scan":
+		return runScan(args[1:], stdout, stderr)
 	default:
 		fmt.Fprintf(stderr, "verax: unknown command %q\n\n", args[0])
 		usage(stderr)
@@ -105,21 +107,24 @@ func writeReport(path string, render func(*os.File) error) error {
 // reorderFlags moves flags before positional files so that
 // `verax test suite.yaml --junit out.xml` works like flag-idiom users expect
 // (Go's flag package stops parsing at the first positional).
-var boolFlags = map[string]bool{"-u": true, "-v": true, "--u": true, "--v": true, "-u=true": true, "-v=true": true}
-
 func reorderFlags(args []string) []string {
+	valueFlags := map[string]bool{
+		"--junit": true, "--html": true, "--sarif": true,
+	}
 	var flags, positional []string
 	for i := 0; i < len(args); i++ {
 		a := args[i]
+		isValueFlag := valueFlags[a]
+		isEqFlag := strings.HasPrefix(a, "--junit=") || strings.HasPrefix(a, "--html=") || strings.HasPrefix(a, "--sarif=")
 		switch {
-		case a == "--junit" || a == "--html":
+		case isValueFlag:
 			if i+1 < len(args) {
 				flags = append(flags, a, args[i+1])
 				i++
 			} else {
 				flags = append(flags, a)
 			}
-		case strings.HasPrefix(a, "--junit=") || strings.HasPrefix(a, "--html="):
+		case isEqFlag:
 			flags = append(flags, a)
 		case strings.HasPrefix(a, "-"):
 			flags = append(flags, a)

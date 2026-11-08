@@ -27,9 +27,13 @@ const (
 )
 
 func ResolveTarget(target string) (TargetKind, error) {
-	st, err := os.Stat(target)
-	if err == nil && st.IsDir() {
+	if st, err := os.Stat(target); err == nil && st.IsDir() {
 		return TargetLocal, nil
+	}
+	// npm scoped specs always contain '/', so the @-prefix wins before any
+	// path-likeness heuristic.
+	if strings.HasPrefix(target, "@") {
+		return TargetNpm, nil
 	}
 	if strings.ContainsAny(target, "/\\") {
 		return 0, fmt.Errorf("scanner: %s looks like a path but is not a directory", target)

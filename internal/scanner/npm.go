@@ -29,15 +29,13 @@ func FetchNPMPackage(spec string) (root string, cleanup func(), err error) {
 		cleanup()
 		return "", nil, fmt.Errorf("scanner: npm pack %s: %w", spec, err)
 	}
-	var packs []struct {
-		Filename string `json:"filename"`
-	}
-	if jerr := json.Unmarshal(packOut, &packs); jerr != nil || len(packs) == 0 {
+	filename := firstPackFilename(packOut)
+	if filename == "" {
 		cleanup()
 		return "", nil, fmt.Errorf("scanner: npm pack output not understood: %s", string(packOut))
 	}
 	// npm may emit the bare filename; join with the destination ourselves.
-	tgz := packs[0].Filename
+	tgz := filename
 	if !filepath.IsAbs(tgz) {
 		tgz = filepath.Join(tmp, tgz)
 	}
@@ -48,6 +46,33 @@ func FetchNPMPackage(spec string) (root string, cleanup func(), err error) {
 		return "", nil, err
 	}
 	return root, cleanup, nil
+}
+
+// firstPackFilename digs the tarball filename out of `npm pack --json`
+// output, which is an array on older npm and an object keyed by package
+// name on npm >= 9-ish.
+func firstPackFilename(out []byte) string {
+	type packInfo struct {
+		Filename string `json:"filename"`
+	}
+	var arr []packInfo
+	if err := json.Unmarshal(out, &arr); err == nil {
+		for _, p := range arr {
+			if p.Filename != "" {
+				return p.Filename
+			}
+		}
+		return ""
+	}
+	var obj map[string]packInfo
+	if err := json.Unmarshal(out, &obj); err == nil {
+		for _, p := range obj {
+			if p.Filename != "" {
+				return p.Filename
+			}
+		}
+	}
+	return ""
 }
 
 // extractTarGz unpacks a gzipped tarball, stripping any leading "package/"
