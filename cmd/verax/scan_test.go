@@ -13,7 +13,7 @@ import (
 
 func TestCLIScanVulnFixtureExits1(t *testing.T) {
 	var out, errBuf bytes.Buffer
-	code := run([]string{"scan", "../../testfixtures/scanvuln"}, &out, &errBuf)
+	code := run([]string{"scan", "../../testfixtures/scanvuln", "--no-osv"}, &out, &errBuf)
 	if code != 1 {
 		t.Fatalf("exit=%d, want 1 (critical/high present)\n%s%s", code, out.String(), errBuf.String())
 	}
@@ -27,7 +27,7 @@ func TestCLIScanVulnFixtureExits1(t *testing.T) {
 
 func TestCLIScanCleanFixtureExits0(t *testing.T) {
 	var out, errBuf bytes.Buffer
-	code := run([]string{"scan", "../../testfixtures/scanclean"}, &out, &errBuf)
+	code := run([]string{"scan", "../../testfixtures/scanclean", "--no-osv"}, &out, &errBuf)
 	if code != 0 {
 		t.Fatalf("exit=%d, want 0\n%s%s", code, out.String(), errBuf.String())
 	}
@@ -39,7 +39,7 @@ func TestCLIScanCleanFixtureExits0(t *testing.T) {
 func TestCLIScanSARIFOutput(t *testing.T) {
 	sarifFile := filepath.Join(t.TempDir(), "out.sarif")
 	var out, errBuf bytes.Buffer
-	code := run([]string{"scan", "../../testfixtures/scanvuln", "--sarif", sarifFile}, &out, &errBuf)
+	code := run([]string{"scan", "../../testfixtures/scanvuln", "--no-osv", "--no-osv", "--sarif", sarifFile}, &out, &errBuf)
 	if code != 1 {
 		t.Fatalf("exit=%d\n%s", code, errBuf.String())
 	}

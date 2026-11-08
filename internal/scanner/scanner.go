@@ -85,6 +85,9 @@ func Scan(root string, target string) (*Result, error) {
 	if pkgPath != "" {
 		if data, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(pkgPath))); err == nil {
 			res.Files++
+			if pkg, ok := parsePackageJSON(data); ok {
+				res.Deps = pkg.Dependencies
+			}
 			for _, rule := range packageRules {
 				res.Findings = append(res.Findings, rule.Check(pkgPath, data)...)
 			}

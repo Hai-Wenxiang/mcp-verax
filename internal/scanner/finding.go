@@ -52,9 +52,10 @@ func (f Finding) Reason() string {
 
 // Result is a full scan outcome.
 type Result struct {
-	Target   string // resolved target description (dir or pkg@version)
-	Root     string // filesystem root that was scanned
-	Files    int    // files inspected
+	Target   string            // resolved target description (dir or pkg@version)
+	Root     string            // filesystem root that was scanned
+	Files    int               // files inspected
+	Deps     map[string]string // package.json dependencies (CVE enrichment input)
 	Findings []Finding
 }
 

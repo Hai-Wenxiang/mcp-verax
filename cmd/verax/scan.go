@@ -15,6 +15,8 @@ func runScan(args []string, stdout, stderr io.Writer) int {
 	fs := flag.NewFlagSet("verax scan", flag.ContinueOnError)
 	fs.SetOutput(stderr)
 	sarifPath := fs.String("sarif", "", "write a SARIF 2.1.0 report to this path")
+	noOSV := fs.Bool("no-osv", false, "skip dependency CVE enrichment (osv.dev)")
+	minScore := fs.Int("min-score", 0, "exit 1 when the score drops below this threshold (0-100)")
 	if err := fs.Parse(reorderFlags(args)); err != nil {
 		return 2
 	}
@@ -52,6 +54,12 @@ func runScan(args []string, stdout, stderr io.Writer) int {
 		return 1
 	}
 
+	if !*noOSV {
+		if err := scanner.CheckOSV(res, scanner.NewOSVClient()); err != nil {
+			fmt.Fprintf(stderr, "verax scan: osv enrichment unavailable (skipped): %v\n", err)
+		}
+	}
+
 	scanner.RenderTerminal(stdout, res)
 
 	if *sarifPath != "" {
@@ -71,6 +79,10 @@ func runScan(args []string, stdout, stderr io.Writer) int {
 
 	counts := res.CountsPerSeverity()
 	if counts[scanner.SevCritical] > 0 || counts[scanner.SevHigh] > 0 {
+		return 1
+	}
+	if *minScore > 0 && res.Score() < *minScore {
+		fmt.Fprintf(stderr, "verax scan: score %d below --min-score %d\n", res.Score(), *minScore)
 		return 1
 	}
 	return 0
