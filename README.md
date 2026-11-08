@@ -36,7 +36,7 @@ self-scan 100/100 — the flywheel (template → suite-green → scan-clean) run
 | **Verax Templates** (`verax new`) | 5 zero-dep scaffolds — filesystem-safe, csv-query, notes-store, rest-api-wrap, web-fetch-md — each suite-green and self-scan 100/100. | 🚧 M3 |
 | **Verax Registry Intelligence** | Registry mirror + batch quality pipeline → leaderboard & quarterly ecosystem reports. | M4 |
 
-Docs index: [`docs/`](./docs/README.md) — [STATUS](./docs/STATUS.md) · [test-kit](./docs/test-kit.md) · [scanner](./docs/scanner.md) · [rules](./docs/rules.md) · [findings](./compat/FINDINGS.md). Contributing: [`AGENTS.md`](./AGENTS.md).
+[Changelog](./CHANGELOG.md) · Docs index: [`docs/`](./docs/README.md) — [STATUS](./docs/STATUS.md) · [test-kit](./docs/test-kit.md) · [scanner](./docs/scanner.md) · [rules](./docs/rules.md) · [findings](./compat/FINDINGS.md). Contributing: [`AGENTS.md`](./AGENTS.md).
 
 ## 中文
 
