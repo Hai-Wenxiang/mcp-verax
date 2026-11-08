@@ -6,17 +6,25 @@
 > *Registry discovers. Verax verifies.* / 注册表负责发现，Verax 负责证明。
 
 [![CI](https://github.com/Hai-Wenxiang/mcp-verax/actions/workflows/ci.yml/badge.svg)](https://github.com/Hai-Wenxiang/mcp-verax/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/badge/release-v0.1.0-blue)](https://github.com/Hai-Wenxiang/mcp-verax/releases/tag/v0.1.0)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](./LICENSE)
 
 ## English
 
 Verax is a toolkit built around one idea: an MCP server should be able to **prove** it is protocol-compliant, stable and safe — and its consumers should be able to verify that claim cheaply, in CI.
 
-**Planned components (M1 → M4):**
+**Try it now** (single binary, no runtime deps):
+
+```bash
+# Linux/macOS/Windows binaries: https://github.com/Hai-Wenxiang/mcp-verax/releases
+verax test your-server.suite.yaml --html report.html
+```
+
+**Components (M1 → M4):**
 
 | Component | What it does | Status |
 |---|---|---|
-| **Verax Test Kit** (`verax test`) | Declarative YAML test suites for MCP servers: handshake/primitive assertions, result snapshots, schema-driven fuzzing, latency SLOs, process-leak detection. Ships as a single Go binary. | 🚧 M1 in progress |
+| **Verax Test Kit** (`verax test`) | Declarative YAML test suites for MCP servers: handshake/primitive assertions, result snapshots, schema-driven fuzzing, latency SLOs, process-leak detection. Ships as a single Go binary. | ✅ v0.1.0 released |
 | **Verax Scanner** | Security / quality / privacy rule packs + dynamic probes → SARIF, 0–100 score, badges. | M2 |
 | **Verax Templates** | MCP server scaffolds with tests and secure defaults baked in (multi-language). | M3 |
 | **Verax Registry Intelligence** | Registry mirror + batch quality pipeline → leaderboard & quarterly ecosystem reports. | M4 |

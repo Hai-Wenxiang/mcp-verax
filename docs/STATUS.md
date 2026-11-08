@@ -34,3 +34,5 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 - 2026-11-08 — M1 development started. ADR-001 accepted: Test Kit in Go.
 - 2026-11-08 — F0–F8 complete: protocol client, DSL, assertions+snapshots,
   runner/CLI, SLO, leak/hang, fuzz, JUnit/HTML reporters, Action+release.
+- 2026-11-08 — **v0.1.0 released**: CI gate green (ci ×3OS + action-test ×2OS);
+  5-platform binaries + SHA256SUMS published via release pipeline.
