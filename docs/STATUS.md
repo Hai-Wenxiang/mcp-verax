@@ -7,11 +7,11 @@
 
 | Feature | Status | Notes |
 |---|---|---|
-| F0 Repo bootstrap (Go module, CI, ADR-001, AGENTS.md) | 🚧 In progress | |
-| F1 Protocol client (JSON-RPC, stdio transport, MCP handshake, primitives) | ⬜ Planned | |
-| F2 Suite DSL parser (YAML schema, validation, env expansion) | ⬜ Planned | |
-| F3 Assertion engine (assertions + snapshots) | ⬜ Planned | |
-| F4 Runner + CLI (`verax test`) + terminal reporter | ⬜ Planned | |
+| F0 Repo bootstrap (Go module, CI, ADR-001, AGENTS.md) | ✅ Done | CI matrix gofmt/vet/test/build ×3 OS |
+| F1 Protocol client (JSON-RPC, stdio transport, MCP handshake, primitives) | ✅ Done | 22 tests, 2 fixtures (echo/mcp) |
+| F2 Suite DSL parser (YAML schema, validation, env expansion) | ✅ Done | 13 tests; strict unknown-field rejection |
+| F3 Assertion engine (assertions + snapshots) | ✅ Done | 15 tests; jest-style golden snapshots |
+| F4 Runner + CLI (`verax test`) + terminal reporter | ✅ Done | shared/respawn modes; example suite smoke 3/3 |
 | F5 SLO (latency p95, concurrency) + process-leak + hang detection | ⬜ Planned | |
 | F6 Schema-driven fuzzing + injection dictionaries | ⬜ Planned | |
 | F7 Reporters (JUnit XML, static HTML) | ⬜ Planned | |
