@@ -2,6 +2,14 @@
 
 All notable changes. Dates are 2026-11-08 (initial development day).
 
+## v0.13.0
+- `verax scan pypi:name[@version]`: scan published PyPI sdists — JSON API
+  version resolve, PEP 503 name normalization, tar.gz + zip extraction
+  (both escape-proof), sdist preferred over wheels
+- registry-pulse scans pypi-packaged entries (`--sample-pypi`, default 5);
+  live: official `mcp-server-fetch` sdist → 98/100
+- Published-artifact trilogy complete: npm + crates.io + PyPI
+
 ## v0.12.0
 - registry-pulse scans crates.io-packaged registry entries alongside npm
   (`--sample-crates`, default 5); pulse rows carry a `registry` field,

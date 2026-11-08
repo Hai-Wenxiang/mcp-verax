@@ -50,6 +50,7 @@
 | Rust rule pack (rs) | ✅ Done | 6 source rules (SEC-003/002/008/014, QUA-107, PRV-303) + Cargo.toml meta; 18 rules total (js/py/rs/pkg); scanrust e2e fixture in CI |
 | crates.io scan targets (`crate:`) | ✅ Done | pure-HTTP fetch (identifying UA per crates.io policy), version resolve, crate-root strip, escape-proof tar reuse; live: tinyjson 2.5.1 → 88/100; real-crate scan in action self-test |
 | pulse scans crate-packaged entries | ✅ Done | registry `crates.io`/`crate` packages join the nightly sample (`--sample-crates`, default 5); rows carry a `registry` field; npm+crate deduped per highest version |
+| PyPI scan targets (`pypi:`) | ✅ Done | sdist fetch (tar.gz + zip, escape-proof), PEP 503 name normalization, version resolve; live: mcp-server-fetch → 98/100; pulse gains `--sample-pypi` (default 5) |
 | next: M3 kickoff (ADR-002 language, needs user) | ⬜ Next | non-blocking queue drained |
 
 Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred

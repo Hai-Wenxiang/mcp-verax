@@ -76,6 +76,14 @@ jobs:
         # the npm real-package scan)
         continue-on-error: true
 
+      - name: Scan a real pypi package via composite action
+        uses: ./
+        with:
+          mode: scan
+          target: pypi:mcp-server-fetch@2026.11.4
+        # same evidence-not-gate policy
+        continue-on-error: true
+
       - name: Test the filesystem-safe template via composite action
         uses: ./
         with:
