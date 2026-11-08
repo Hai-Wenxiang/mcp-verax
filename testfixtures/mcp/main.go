@@ -103,6 +103,11 @@ func main() {
 						"description": "Sleeps then echoes.",
 						"inputSchema": map[string]any{"type": "object"},
 					},
+					map[string]any{
+						"name":        "env",
+						"description": "Returns VERAX_PROBE (tests per-case env injection).",
+						"inputSchema": map[string]any{"type": "object"},
+					},
 				},
 			})
 		case "tools/call":
@@ -118,6 +123,12 @@ func main() {
 			case "echo":
 				respond(w, env_.ID, map[string]any{
 					"content": []any{map[string]any{"type": "text", "text": fmt.Sprint(p.Arguments["msg"])}},
+				})
+			case "env":
+				respond(w, env_.ID, map[string]any{
+					"content": []any{map[string]any{
+						"type": "text", "text": "VERAX_PROBE=" + os.Getenv("VERAX_PROBE"),
+					}},
 				})
 			case "fail":
 				respond(w, env_.ID, map[string]any{

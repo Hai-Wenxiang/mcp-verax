@@ -82,6 +82,9 @@ func (s *SnapshotStore) Check(name string, actual any) CheckResult {
 	}
 }
 
+// Path returns the snapshot file location for diagnostics.
+func (s *SnapshotStore) Path() string { return s.path }
+
 // Save persists pending changes, creating directories as needed.
 func (s *SnapshotStore) Save() error {
 	if !s.dirty {
