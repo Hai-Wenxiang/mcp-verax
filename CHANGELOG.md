@@ -2,6 +2,13 @@
 
 All notable changes. Dates are 2026-11-08 (initial development day).
 
+## v0.12.0
+- registry-pulse scans crates.io-packaged registry entries alongside npm
+  (`--sample-crates`, default 5); pulse rows carry a `registry` field,
+  markdown gains a Registry column
+- npm/crate pools deduped independently by highest version; shared
+  dedupe/count helpers extracted with tests
+
 ## v0.11.0
 - `verax scan crate:name[@version]`: scan published crates.io artifacts —
   pure-HTTP fetch with an identifying User-Agent (crates.io policy),

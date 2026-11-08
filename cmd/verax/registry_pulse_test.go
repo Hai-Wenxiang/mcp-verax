@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -55,6 +56,50 @@ func TestFetchRegistryPageExhaustsRetries(t *testing.T) {
 	}
 }
 
+func mkEntry(t *testing.T, name, rt, id, ver string) regEntry {
+	t.Helper()
+	var e regEntry
+	doc := fmt.Sprintf(`{"server":{"name":%q,"packages":[{"registryType":%q,"identifier":%q,"version":%q}]}}`, name, rt, id, ver)
+	if err := json.Unmarshal([]byte(doc), &e); err != nil {
+		t.Fatal(err)
+	}
+	return e
+}
+
+func TestDedupeHighestVersion(t *testing.T) {
+	entries := []regEntry{
+		mkEntry(t, "bb", "crates.io", "rmcp", "0.1.0"),
+		mkEntry(t, "aa", "crates.io", "rmcp", "0.3.2"),
+		mkEntry(t, "aa", "crates.io", "rmcp", "0.2.0"),
+		mkEntry(t, "cc", "npm", "x", "1.0.0"),
+	}
+	got := dedupeHighestVersion(entries)
+	if len(got) != 2 {
+		t.Fatalf("dedup = %d entries, want 2: %+v", len(got), got)
+	}
+	if got[0].Server.Name != "aa" || got[0].Server.Packages[0].Version != "0.3.2" {
+		t.Errorf("aa should keep 0.3.2, got %+v", got[0].Server.Packages[0])
+	}
+	if got[1].Server.Name != "cc" {
+		t.Errorf("name sort broken: %+v", got)
+	}
+}
+
+func TestCountCrate(t *testing.T) {
+	entries := []regEntry{
+		mkEntry(t, "a", "crates.io", "rmcp", "1.0.0"),
+		mkEntry(t, "b", "crate", "legacy-shape", "1.0.0"),
+		mkEntry(t, "c", "npm", "x", "1.0.0"),
+		mkEntry(t, "d", "pypi", "y", "1.0.0"),
+	}
+	if n := countCrate(entries); n != 2 {
+		t.Fatalf("countCrate = %d, want 2", n)
+	}
+	if n := countNpm(entries); n != 1 {
+		t.Fatalf("countNpm = %d, want 1", n)
+	}
+}
+
 func TestRunRegistryPulseWritesLatestForBadge(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -68,6 +113,7 @@ func TestRunRegistryPulseWritesLatestForBadge(t *testing.T) {
 		"--registry", srv.URL,
 		"--out", out,
 		"--retries", "1",
+		"--sample-crates", "0", // stay offline: crate fetches hit real crates.io
 	}, &stdout, &stderr)
 	if code != 0 {
 		t.Fatalf("exit %d, stderr:\n%s", code, stderr.String())

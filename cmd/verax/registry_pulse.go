@@ -40,6 +40,7 @@ type regPage struct {
 }
 
 var npmNameRe = regexp.MustCompile(`^(@[a-z0-9-~][a-z0-9-._~]*/)?[a-z0-9-~][a-z0-9-._~]*$`)
+var crateNameRe = regexp.MustCompile(`^[a-zA-Z0-9_-]{1,64}$`)
 
 // runRegistryPulse implements
 // `verax registry-pulse [--pages N] [--sample N] [--out dir] [--registry URL]`.
@@ -48,6 +49,7 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 	fs.SetOutput(stderr)
 	pages := fs.Int("pages", 3, "registry pages to pull (30 entries each)")
 	sample := fs.Int("sample", 10, "max npm entries to scan")
+	sampleCrates := fs.Int("sample-crates", 5, "max crates.io entries to scan")
 	outDir := fs.String("out", "docs/registry", "output directory for pulse reports")
 	registry := fs.String("registry", "https://registry.modelcontextprotocol.io", "registry base URL")
 	jobs := fs.Int("j", 4, "concurrent package scans")
@@ -92,78 +94,94 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 		fmt.Fprintf(stdout, "registry: full walk pulled %d entries\n", len(entries))
 	}
 
-	// 2) pick npm-packaged entries (deterministic: name order)
-	var npmEntries []regEntry
+	// 2) pick npm + crates.io packaged entries (deterministic: name order)
+	var npmEntries, crateEntries []regEntry
 	for _, e := range entries {
 		for _, pkg := range e.Server.Packages {
 			if pkg.RegistryType == "npm" && npmNameRe.MatchString(pkg.Identifier) {
 				npmEntries = append(npmEntries, e)
 				break
 			}
+			if (pkg.RegistryType == "crates.io" || pkg.RegistryType == "crate") && crateNameRe.MatchString(pkg.Identifier) {
+				crateEntries = append(crateEntries, e)
+				break
+			}
 		}
 	}
-	sort.Slice(npmEntries, func(i, j int) bool { return npmEntries[i].Server.Name < npmEntries[j].Server.Name })
-	// dedup by package identifier, keeping the highest published version
-	// (the registry lists multiple versions of the same package as entries)
-	dedup := npmEntries[:0]
-	best := map[string]regEntry{}
-	order := []string{}
-	for _, e := range npmEntries {
-		id := e.Server.Packages[0].Identifier
-		cur, ok := best[id]
-		if !ok {
-			best[id] = e
-			order = append(order, id)
-			continue
-		}
-		if e.Server.Packages[0].Version > cur.Server.Packages[0].Version {
-			best[id] = e
-		}
-	}
-	for _, id := range order {
-		dedup = append(dedup, best[id])
-	}
-	npmEntries = dedup
+	npmEntries = dedupeHighestVersion(npmEntries)
+	crateEntries = dedupeHighestVersion(crateEntries)
 	if len(npmEntries) > *sample {
 		npmEntries = npmEntries[:*sample]
 	}
+	if len(crateEntries) > *sampleCrates {
+		crateEntries = crateEntries[:*sampleCrates]
+	}
 
-	fmt.Fprintf(stdout, "registry: %d entries pulled, %d npm-packaged, scanning %d\n", len(entries), len(npmEntries), len(npmEntries))
+	fmt.Fprintf(stdout, "registry: %d entries pulled, %d npm-packaged, %d crate-packaged, scanning %d+%d\n",
+		len(entries), len(npmEntries), len(crateEntries), len(npmEntries), len(crateEntries))
 
-	// 3) scan each npm entry (published artifact)
+	// 3) scan each entry (published artifact; npm via `npm pack`, crates via
+	// the crates.io download API)
+	type scanTarget struct {
+		name string
+		spec string // fetch spec as passed to the fetcher
+		disp string // package display string written into the report
+		kind string // "npm" | "crate"
+	}
+	var targets []scanTarget
+	for _, e := range npmEntries {
+		pkg := e.Server.Packages[0]
+		spec := pkg.Identifier
+		if pkg.Version != "" {
+			spec += "@" + pkg.Version
+		}
+		targets = append(targets, scanTarget{name: e.Server.Name, spec: spec, disp: spec, kind: "npm"})
+	}
+	for _, e := range crateEntries {
+		pkg := e.Server.Packages[0]
+		spec := "crate:" + pkg.Identifier
+		if pkg.Version != "" {
+			spec += "@" + pkg.Version
+		}
+		targets = append(targets, scanTarget{name: e.Server.Name, spec: spec, disp: spec, kind: "crate"})
+	}
+
 	type row struct {
 		Name     string            `json:"name"`
 		Package  string            `json:"package"`
+		Registry string            `json:"registry,omitempty"`
 		Score    int               `json:"score"`
 		Files    int               `json:"files"`
 		Findings []scanner.Finding `json:"findings,omitempty"`
 		Error    string            `json:"error,omitempty"`
 	}
 	// concurrent scans, results kept in input order
-	rows := make([]row, len(npmEntries))
+	rows := make([]row, len(targets))
 	sem := make(chan struct{}, maxInt(1, *jobs))
 	var wg sync.WaitGroup
-	for i, e := range npmEntries {
-		pkg := e.Server.Packages[0]
-		spec := pkg.Identifier
-		if pkg.Version != "" {
-			spec += "@" + pkg.Version
-		}
-		rows[i] = row{Name: e.Server.Name, Package: spec}
+	for i, tg := range targets {
+		rows[i] = row{Name: tg.name, Package: tg.disp, Registry: tg.kind}
 		wg.Add(1)
-		go func(i int, name, spec string) {
+		go func(i int, name string, tg scanTarget) {
 			defer wg.Done()
 			sem <- struct{}{}
 			defer func() { <-sem }()
 			r := rows[i]
-			root, cleanup, err := scanner.FetchNPMPackage(spec)
+			var root string
+			var cleanup func()
+			var err error
+			if tg.kind == "crate" {
+				root, cleanup, err = scanner.FetchCratePackage(tg.spec)
+			} else {
+				root, cleanup, err = scanner.FetchNPMPackage(tg.spec)
+			}
 			if err != nil {
 				r.Error = err.Error()
 				rows[i] = r
 				fmt.Fprintf(stdout, "  %-40s FETCH-ERR %v\n", name, err)
 				return
 			}
-			res, err := scanner.Scan(root, spec)
+			res, err := scanner.Scan(root, tg.disp)
 			cleanup()
 			if err != nil {
 				r.Error = err.Error()
@@ -175,7 +193,7 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 			r.Findings = res.Findings
 			rows[i] = r
 			fmt.Fprintf(stdout, "  %-40s %3d/100 (%d findings, %d files)\n", name, r.Score, len(r.Findings), r.Files)
-		}(i, e.Server.Name, spec)
+		}(i, tg.name, tg)
 	}
 	wg.Wait()
 
@@ -189,9 +207,10 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 		Date     string `json:"date"`
 		Entries  int    `json:"entries_pulled"`
 		NpmTotal int    `json:"npm_packaged"`
+		Crates   int    `json:"crate_packaged"`
 		Scanned  int    `json:"scanned"`
 		Rows     []row  `json:"rows"`
-	}{Date: date, Entries: len(entries), NpmTotal: countNpm(entries), Scanned: len(rows), Rows: rows}
+	}{Date: date, Entries: len(entries), NpmTotal: countNpm(entries), Crates: countCrate(entries), Scanned: len(rows), Rows: rows}
 	raw, _ := json.MarshalIndent(report, "", "  ")
 	jsonPath := *outDir + "/pulse-" + date + ".json"
 	if err := os.WriteFile(jsonPath, raw, 0o644); err != nil {
@@ -207,14 +226,14 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 	mdPath := *outDir + "/pulse-" + date + ".md"
 	var b strings.Builder
 	fmt.Fprintf(&b, "# Registry Pulse — %s\n\n", date)
-	fmt.Fprintf(&b, "Official registry entries pulled: **%d** · npm-packaged: **%d** · scanned: **%d**\n\n", report.Entries, report.NpmTotal, report.Scanned)
-	fmt.Fprintf(&b, "| Server | Package | Score | Findings |\n|---|---|---|---|\n")
+	fmt.Fprintf(&b, "Official registry entries pulled: **%d** · npm-packaged: **%d** · crate-packaged: **%d** · scanned: **%d**\n\n", report.Entries, report.NpmTotal, report.Crates, report.Scanned)
+	fmt.Fprintf(&b, "| Server | Package | Registry | Score | Findings |\n|---|---|---|---|---|\n")
 	for _, r := range rows {
 		score := fmt.Sprintf("%d", r.Score)
 		if r.Error != "" {
 			score = "—"
 		}
-		fmt.Fprintf(&b, "| %s | `%s` | %s | %d |\n", r.Name, r.Package, score, len(r.Findings))
+		fmt.Fprintf(&b, "| %s | `%s` | %s | %s | %d |\n", r.Name, r.Package, r.Registry, score, len(r.Findings))
 	}
 	fmt.Fprintf(&b, "\n_Generated by `verax registry-pulse`; findings detail in the sibling JSON._\n")
 	if err := os.WriteFile(mdPath, []byte(b.String()), 0o644); err != nil {
@@ -283,4 +302,43 @@ func countNpm(entries []regEntry) int {
 		}
 	}
 	return n
+}
+
+func countCrate(entries []regEntry) int {
+	n := 0
+	for _, e := range entries {
+		for _, pkg := range e.Server.Packages {
+			if pkg.RegistryType == "crates.io" || pkg.RegistryType == "crate" {
+				n++
+				break
+			}
+		}
+	}
+	return n
+}
+
+// dedupeHighestVersion sorts entries by server name (deterministic) and
+// keeps only the highest published version per package identifier (the
+// registry lists multiple versions of the same package as entries).
+func dedupeHighestVersion(entries []regEntry) []regEntry {
+	sort.Slice(entries, func(i, j int) bool { return entries[i].Server.Name < entries[j].Server.Name })
+	best := map[string]regEntry{}
+	order := []string{}
+	for _, e := range entries {
+		id := e.Server.Packages[0].Identifier
+		cur, ok := best[id]
+		if !ok {
+			best[id] = e
+			order = append(order, id)
+			continue
+		}
+		if e.Server.Packages[0].Version > cur.Server.Packages[0].Version {
+			best[id] = e
+		}
+	}
+	out := make([]regEntry, 0, len(order))
+	for _, id := range order {
+		out = append(out, best[id])
+	}
+	return out
 }
