@@ -138,6 +138,21 @@ leak:
   process_exit: true   # server must exit on stdin EOF within grace (3s)
 ```
 
+### Side-effect probe (dynamic)
+
+```yaml
+probe:
+  side_effect:
+    hang_ms: 5000
+    args:            # optional per-prop templates; ${VERAX_HONEYROOT} = honeypot dir
+      path: "${VERAX_HONEYROOT}/probe.txt"
+```
+
+Calls every tool once with honeypot-substituted arguments and diffs the
+honeypot directory around each call — tools that write while presenting as
+read-only are reported with their exact changes. (Note: filesystem scope
+only; servers writing outside the honeypot are invisible to this probe.)
+
 ### SSRF probe (dynamic)
 
 ```yaml

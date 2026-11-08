@@ -104,7 +104,15 @@ type Leak struct {
 
 // Probe configures dynamic behaviour probes.
 type Probe struct {
-	SSRF *SSRFProbe `yaml:"ssrf"`
+	SSRF       *SSRFProbe       `yaml:"ssrf"`
+	SideEffect *SideEffectProbe `yaml:"side_effect"`
+}
+
+// SideEffectProbe: honeypot directory + argument template; every tool is
+// called once and any write into the honeypot is reported per tool.
+type SideEffectProbe struct {
+	Args   map[string]string `yaml:"args"`    // prop -> value template; ${VERAX_HONEYROOT} substituted
+	HangMS int               `yaml:"hang_ms"` // per-call budget (default 8000)
 }
 
 // SSRFProbe: inject a listener URL into every string argument of every tool

@@ -131,15 +131,25 @@ func stringProperties(schema []byte) []string {
 	return out
 }
 
-// runProbeIfConfigured appends the SSRF probe case when the suite asks for it.
+// runProbeIfConfigured appends probe cases (SSRF, side-effect) as requested.
 func runProbeIfConfigured(s *dsl.Suite, cli mcpConn, report *SuiteReport) {
-	if s.Probe == nil || s.Probe.SSRF == nil {
+	if s.Probe == nil {
 		return
 	}
-	check, _ := runSSRFProbe(cli, *s.Probe.SSRF)
-	report.Cases = append(report.Cases, CaseResult{
-		Name:   "probe(ssrf)",
-		Status: statusFromChecks([]assert.CheckResult{check}),
-		Checks: []assert.CheckResult{check},
-	})
+	if s.Probe.SSRF != nil {
+		check, _ := runSSRFProbe(cli, *s.Probe.SSRF)
+		report.Cases = append(report.Cases, CaseResult{
+			Name:   "probe(ssrf)",
+			Status: statusFromChecks([]assert.CheckResult{check}),
+			Checks: []assert.CheckResult{check},
+		})
+	}
+	if s.Probe.SideEffect != nil {
+		check := runSideEffectProbe(cli, *s.Probe.SideEffect)
+		report.Cases = append(report.Cases, CaseResult{
+			Name:   "probe(side_effect)",
+			Status: statusFromChecks([]assert.CheckResult{check}),
+			Checks: []assert.CheckResult{check},
+		})
+	}
 }

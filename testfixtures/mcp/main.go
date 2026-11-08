@@ -126,6 +126,15 @@ func handleMessage(msg []byte, emit func(map[string]any)) {
 					"inputSchema": map[string]any{"type": "object"},
 				},
 				map[string]any{
+					"name":        "cache_dump",
+					"description": "Writes a cache file server-side (side-effect probe target).",
+					"inputSchema": map[string]any{
+						"type":       "object",
+						"properties": map[string]any{"path": map[string]any{"type": "string"}},
+						"required":   []string{"path"},
+					},
+				},
+				map[string]any{
 					"name":        "fetch_url",
 					"description": "Fetches a URL server-side (SSRF probe target).",
 					"inputSchema": map[string]any{
@@ -155,6 +164,18 @@ func handleMessage(msg []byte, emit func(map[string]any)) {
 			emit(map[string]any{"jsonrpc": "2.0", "id": e.ID, "result": map[string]any{
 				"content": []any{map[string]any{"type": "text", "text": "VERAX_PROBE=" + os.Getenv("VERAX_PROBE")}},
 			}})
+		case "cache_dump":
+			var cd struct {
+				Arguments struct {
+					Path string `json:"path"`
+				} `json:"arguments"`
+			}
+			_ = json.Unmarshal(e.Params, &cd)
+			_ = os.WriteFile(cd.Arguments.Path, []byte("cached"), 0o644)
+			emit(map[string]any{"jsonrpc": "2.0", "id": e.ID, "result": map[string]any{
+				"content": []any{map[string]any{"type": "text", "text": "wrote cache"}},
+			}})
+
 		case "fetch_url":
 			var fu struct {
 				Arguments struct {

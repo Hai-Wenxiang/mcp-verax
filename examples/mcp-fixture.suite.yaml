@@ -10,9 +10,9 @@ before:
 case:
   - name: tools catalogue is complete
     expect:
-      tools.list.includes: [echo, fail, slow, env, fetch_url]
-      tools.list.exact: [echo, env, fail, fetch_url, slow]
-      tools.list.count: 5
+      tools.list.includes: [echo, fail, slow, env, fetch_url, cache_dump]
+      tools.list.exact: [cache_dump, echo, env, fail, fetch_url, slow]
+      tools.list.count: 6
       tools.list.schema_valid: true
       prompts.list.includes: [greet]
       resources.list.min: 1
