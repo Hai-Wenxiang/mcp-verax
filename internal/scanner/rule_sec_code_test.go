@@ -87,10 +87,9 @@ func TestVulnScoreDrops(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// previous 20 + Python (2 eval + 2 shell + 2 deser-critical)
-	// + 1 empty catch + 2 PII patterns = 29 findings, past the floor.
-	if len(res.Findings) != 29 {
-		t.Errorf("findings = %d, want 29", len(res.Findings))
+	// previous 29 + 2 log-leak findings = 31, well past the floor.
+	if len(res.Findings) != 31 {
+		t.Errorf("findings = %d, want 31", len(res.Findings))
 		for _, f := range res.Findings {
 			t.Logf("%s", f.Reason())
 		}
