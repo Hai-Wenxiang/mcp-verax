@@ -91,3 +91,6 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 
 - 2026-11-08 — **v0.4.0 released**: session-echo, --json/--badge/--repeat,
   real-package CI scan (F-4: official server-memory, 6 advisories).
+
+- 2026-11-08 — **v0.5.0 released**: side-effect probe, -j parallelism,
+  pyproject/go.mod scanning, verax init, self-scan 100/100.

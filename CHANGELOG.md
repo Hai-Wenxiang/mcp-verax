@@ -2,6 +2,14 @@
 
 All notable changes. Dates are 2026-11-08 (initial development day).
 
+## v0.5.0
+- `probe.side_effect`: dynamic honeypot-diff probe (write-while-read-only)
+- `verax test -j N`: suites in parallel
+- Scanner: Python (pyproject.toml/PEP-621) and Go (go.mod) project support;
+  LICENSE presence; verax self-scans 100/100
+- `verax init`: generate a starter suite from a live server (green-first
+  skeletons, verified on official server-memory)
+
 ## v0.4.0
 - `verax test --repeat N`: per-case stability table with flake detection
 - `verax test -j N`: suites run concurrently (bounded pool, stable order)
