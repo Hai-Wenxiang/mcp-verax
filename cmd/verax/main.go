@@ -53,6 +53,7 @@ func runTest(args []string, stdout, stderr io.Writer) int {
 	update := fs.Bool("u", false, "accept changed/new snapshots (goldens rewritten)")
 	verbose := fs.Bool("v", false, "show passing checks too")
 	watch := fs.Bool("watch", false, "re-run suites when their files change (dev mode)")
+	repeat := fs.Int("repeat", 1, "run all suites N times and report per-case stability (flake detection)")
 	junitPath := fs.String("junit", "", "write a JUnit XML report to this path")
 	htmlPath := fs.String("html", "", "write a single-file HTML report to this path")
 	if err := fs.Parse(reorderFlags(args)); err != nil {
@@ -104,6 +105,24 @@ func runTest(args []string, stdout, stderr io.Writer) int {
 	if *watch {
 		return watchLoop(files, runOnce, stdout)
 	}
+	if *repeat > 1 {
+		st := newStability(*repeat)
+		for i := 0; i < *repeat; i++ {
+			var reports []*runner.SuiteReport
+			for _, f := range files {
+				reports = append(reports, runner.RunSuiteFile(f, runner.Options{
+					UpdateSnapshots: *update,
+				}))
+			}
+			report.RenderTerminal(stdout, reports, *verbose)
+			st.record(reports)
+		}
+		st.render(stdout)
+		if st.failed {
+			return 1
+		}
+		return 0
+	}
 	return runOnce()
 }
 
@@ -121,14 +140,14 @@ func writeReport(path string, render func(*os.File) error) error {
 // (Go's flag package stops parsing at the first positional).
 func reorderFlags(args []string) []string {
 	valueFlags := map[string]bool{
-		"--junit": true, "--html": true, "--sarif": true, "--min-score": true, "--dir": true, "--badge": true, "--json": true,
+		"--junit": true, "--html": true, "--sarif": true, "--min-score": true, "--dir": true, "--badge": true, "--json": true, "--repeat": true,
 	}
 	var flags, positional []string
 	for i := 0; i < len(args); i++ {
 		a := args[i]
 		isValueFlag := valueFlags[a]
 		isEqFlag := strings.HasPrefix(a, "--junit=") || strings.HasPrefix(a, "--html=") ||
-			strings.HasPrefix(a, "--sarif=") || strings.HasPrefix(a, "--min-score=") || strings.HasPrefix(a, "--dir=") || strings.HasPrefix(a, "--badge=") || strings.HasPrefix(a, "--json=")
+			strings.HasPrefix(a, "--sarif=") || strings.HasPrefix(a, "--min-score=") || strings.HasPrefix(a, "--dir=") || strings.HasPrefix(a, "--badge=") || strings.HasPrefix(a, "--json=") || strings.HasPrefix(a, "--repeat=") || strings.HasPrefix(a, "--repeat=")
 		switch {
 		case isValueFlag:
 			if i+1 < len(args) {
