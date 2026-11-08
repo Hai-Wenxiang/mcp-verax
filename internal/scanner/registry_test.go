@@ -25,9 +25,15 @@ func TestAllRulesCatalog(t *testing.T) {
 			if !strings.Contains(r.Lang, "js") || !strings.Contains(r.Lang, "py") {
 				t.Errorf("rule %s should merge languages, got %q", r.ID, r.Lang)
 			}
-		case "VX-SEC-002", "VX-SEC-003", "VX-SEC-008", "VX-PRV-303":
+		}
+		switch r.ID {
+		case "VX-SEC-002", "VX-SEC-008", "VX-PRV-303":
 			if !strings.Contains(r.Lang, "rs") {
 				t.Errorf("rule %s should include the Rust pack, got %q", r.ID, r.Lang)
+			}
+		case "VX-SEC-014", "VX-QUA-107":
+			if r.Lang != "rs" {
+				t.Errorf("rule %s should be Rust-only, got %q", r.ID, r.Lang)
 			}
 		}
 	}
