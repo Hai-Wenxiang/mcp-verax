@@ -18,6 +18,7 @@ func runScan(args []string, stdout, stderr io.Writer) int {
 	noOSV := fs.Bool("no-osv", false, "skip dependency CVE enrichment (osv.dev)")
 	minScore := fs.Int("min-score", 0, "exit 1 when the score drops below this threshold (0-100)")
 	badgePath := fs.String("badge", "", "write a shields-style SVG score badge to this path")
+	jsonPath := fs.String("json", "", "write full machine-readable JSON to this path")
 	if err := fs.Parse(reorderFlags(args)); err != nil {
 		return 2
 	}
@@ -62,6 +63,21 @@ func runScan(args []string, stdout, stderr io.Writer) int {
 	}
 
 	scanner.RenderTerminal(stdout, res)
+
+	if *jsonPath != "" {
+		jf, jerr := os.Create(*jsonPath)
+		if jerr != nil {
+			fmt.Fprintf(stderr, "verax scan: json: %v\n", jerr)
+			return 1
+		}
+		if jerr := scanner.RenderJSON(jf, res); jerr != nil {
+			jf.Close()
+			fmt.Fprintf(stderr, "verax scan: json: %v\n", jerr)
+			return 1
+		}
+		jf.Close()
+		fmt.Fprintf(stdout, "json report: %s\n", *jsonPath)
+	}
 
 	if *badgePath != "" {
 		bf, berr := os.Create(*badgePath)
