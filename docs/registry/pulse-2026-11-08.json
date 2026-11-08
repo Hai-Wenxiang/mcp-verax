@@ -3,7 +3,8 @@
   "entries_pulled": 300,
   "npm_packaged": 53,
   "crate_packaged": 0,
-  "scanned": 29,
+  "pypi_packaged": 1,
+  "scanned": 30,
   "rows": [
     {
       "name": "agency.extremely/agency",
@@ -2353,6 +2354,87 @@
           "Line": 38,
           "Snippet": "const res = await fetch(url, {",
           "Why": "tool-controlled URLs can target internal services (SSRF) unless destinations are constrained"
+        }
+      ]
+    },
+    {
+      "name": "ai.adeu/adeu",
+      "package": "pypi:adeu@1.5.2",
+      "registry": "pypi",
+      "score": 20,
+      "files": 138,
+      "findings": [
+        {
+          "RuleID": "VX-SEC-003",
+          "Title": "shell command built from non-literal input",
+          "Severity": "high",
+          "File": "src/adeu/assets/marked.min.js",
+          "Line": 15,
+          "Snippet": "`)}var S=class{options;rules;lexer;constructor(e){this.options=e||w}space(e){let t=this.rules.block.newline.exec(e);if(t\u0026\u0026t[0].length\u003e0)return{type:\"space\",raw:t[0]}}code(e){let t=this.rules.block.code.exec(e);if(t){let n=t[0].replace(this.rules.other.codeRemoveIndent,\"\");return{type:\"code\",raw:t[0],codeBlockStyle:\"indented\",text:this.options.pedantic?n:A(n,`",
+          "Why": "command string is constructed, not a literal — injection surface"
+        },
+        {
+          "RuleID": "VX-SEC-003",
+          "Title": "shell command built from non-literal input",
+          "Severity": "high",
+          "File": "src/adeu/assets/marked.min.js",
+          "Line": 16,
+          "Snippet": "`)}}}fences(e){let t=this.rules.block.fences.exec(e);if(t){let n=t[0],s=rt(n,t[3]||\"\",this.rules);return{type:\"code\",raw:n,lang:t[2]?t[2].trim().replace(this.rules.inline.anyPunctuation,\"$1\"):t[2],text:s}}}heading(e){let t=this.rules.block.heading.exec(e);if(t){let n=t[2].trim();if(this.rules.other.endingHash.test(n)){let s=A(n,\"#\");(this.options.pedantic||!s||this.rules.other.endingSpaceChar.test(s))\u0026\u0026(n=s.trim())}return{type:\"heading\",raw:t[0],depth:t[1].length,text:n,tokens:this.lexer.inline(n)}}}hr(e){let t=this.rules.block.hr.exec(e);if(t)return{type:\"hr\",raw:A(t[0],`",
+          "Why": "command string is constructed, not a literal — injection surface"
+        },
+        {
+          "RuleID": "VX-SEC-003",
+          "Title": "shell command built from non-literal input",
+          "Severity": "high",
+          "File": "src/adeu/assets/marked.min.js",
+          "Line": 17,
+          "Snippet": "`)}}blockquote(e){let t=this.rules.block.blockquote.exec(e);if(t){let n=A(t[0],`",
+          "Why": "command string is constructed, not a literal — injection surface"
+        },
+        {
+          "RuleID": "VX-SEC-003",
+          "Title": "shell command built from non-literal input",
+          "Severity": "high",
+          "File": "src/adeu/assets/marked.min.js",
+          "Line": 28,
+          "Snippet": "`);continue}}return{type:\"blockquote\",raw:s,tokens:r,text:i}}}list(e){let t=this.rules.block.list.exec(e);if(t){let n=t[1].trim(),s=n.length\u003e1,i={type:\"list\",raw:\"\",ordered:s,start:s?+n.slice(0,-1):\"\",loose:!1,items:[]};n=s?`\\\\d{1,9}\\\\${n.slice(-1)}`:`\\\\${n}`,this.options.pedantic\u0026\u0026(n=s?n:\"[*+-]\");let r=this.rules.other.listItemRegex(n),o=!1;for(;e;){let c=!1,p=\"\",u=\"\";if(!(t=r.exec(e))||this.rules.block.hr.test(e))break;p=t[0],e=e.substring(p.length);let d=t[2].split(`",
+          "Why": "command string is constructed, not a literal — injection surface"
+        },
+        {
+          "RuleID": "VX-SEC-003",
+          "Title": "shell command built from non-literal input",
+          "Severity": "high",
+          "File": "src/adeu/assets/marked.min.js",
+          "Line": 35,
+          "Snippet": "`,e=e.substring(G.length+1),d=C.slice(f)}}i.loose||(o?i.loose=!0:this.rules.other.doubleBlankLine.test(p)\u0026\u0026(o=!0));let y=null,ee;this.options.gfm\u0026\u0026(y=this.rules.other.listIsTask.exec(u),y\u0026\u0026(ee=y[0]!==\"[ ] \",u=u.replace(this.rules.other.listReplaceTask,\"\"))),i.items.push({type:\"list_item\",raw:p,task:!!y,checked:ee,loose:!1,text:u,tokens:[]}),i.raw+=p}let a=i.items.at(-1);if(a)a.raw=a.raw.trimEnd(),a.text=a.text.trimEnd();else return;i.raw=i.raw.trimEnd();for(let c=0;c\u003ci.items.length;c++)if(this.lexer.state.top=!1,i.items[c].tokens=this.lexer.blockTokens(i.items[c].text,[]),!i.loose){let p=i.items[c].tokens.filter(d=\u003ed.type===\"space\"),u=p.length\u003e0\u0026\u0026p.some(d=\u003ethis.rules.other.anyLine.test(d.raw));i.loose=u}if(i.loose)for(let c=0;c\u003ci.items.length;c++)i.items[c].loose=!0;return i}}html(e){let t=this.rules.block.html.exec(e);if(t)return{type:\"html\",block:!0,raw:t[0],pre:t[1]===\"pre\"||t[1]===\"script\"||t[1]===\"style\",text:t[0]}}def(e){let t=this.rules.block.def.exec(e);if(t){let n=t[1].toLowerCase().replace(this.rules.other.multipleSpaceGlobal,\" \"),s=t[2]?t[2].replace(this.rules.other.hrefBrackets,\"$1\").replace(this.rules.inline.anyPunctuation,\"$1\"):\"\",i=t[3]?t[3].substring(1,t[3].length-1).replace(this.rules.inline.anyPunctuation,\"$1\"):t[3];return{type:\"def\",tag:n,raw:t[0],href:s,title:i}}}table(e){let t=this.rules.block.table.exec(e);if(!t||!this.rules.other.tableDelimiter.test(t[2]))return;let n=Y(t[1]),s=t[2].replace(this.rules.other.tableAlignChars,\"\").split(\"|\"),i=t[3]?.trim()?t[3].replace(this.rules.other.tableRowBlankLine,\"\").split(`",
+          "Why": "command string is constructed, not a literal — injection surface"
+        },
+        {
+          "RuleID": "VX-SEC-003",
+          "Title": "shell command built from non-literal input",
+          "Severity": "high",
+          "File": "src/adeu/assets/marked.min.js",
+          "Line": 36,
+          "Snippet": "`):[],r={type:\"table\",raw:t[0],header:[],align:[],rows:[]};if(n.length===s.length){for(let o of s)this.rules.other.tableAlignRight.test(o)?r.align.push(\"right\"):this.rules.other.tableAlignCenter.test(o)?r.align.push(\"center\"):this.rules.other.tableAlignLeft.test(o)?r.align.push(\"left\"):r.align.push(null);for(let o=0;o\u003cn.length;o++)r.header.push({text:n[o],tokens:this.lexer.inline(n[o]),header:!0,align:r.align[o]});for(let o of i)r.rows.push(Y(o,r.header.length).map((a,c)=\u003e({text:a,tokens:this.lexer.inline(a),header:!1,align:r.align[c]})));return r}}lheading(e){let t=this.rules.block.lheading.exec(e);if(t)return{type:\"heading\",raw:t[0],depth:t[2].charAt(0)===\"=\"?1:2,text:t[1],tokens:this.lexer.inline(t[1])}}paragraph(e){let t=this.rules.block.paragraph.exec(e);if(t){let n=t[1].charAt(t[1].length-1)===`",
+          "Why": "command string is constructed, not a literal — injection surface"
+        },
+        {
+          "RuleID": "VX-SEC-003",
+          "Title": "shell command built from non-literal input",
+          "Severity": "high",
+          "File": "src/adeu/assets/marked.min.js",
+          "Line": 37,
+          "Snippet": "`?t[1].slice(0,-1):t[1];return{type:\"paragraph\",raw:t[0],text:n,tokens:this.lexer.inline(n)}}}text(e){let t=this.rules.block.text.exec(e);if(t)return{type:\"text\",raw:t[0],text:t[0],tokens:this.lexer.inline(t[0])}}escape(e){let t=this.rules.inline.escape.exec(e);if(t)return{type:\"escape\",raw:t[0],text:t[1]}}tag(e){let t=this.rules.inline.tag.exec(e);if(t)return!this.lexer.state.inLink\u0026\u0026this.rules.other.startATag.test(t[0])?this.lexer.state.inLink=!0:this.lexer.state.inLink\u0026\u0026this.rules.other.endATag.test(t[0])\u0026\u0026(this.lexer.state.inLink=!1),!this.lexer.state.inRawBlock\u0026\u0026this.rules.other.startPreScriptTag.test(t[0])?this.lexer.state.inRawBlock=!0:this.lexer.state.inRawBlock\u0026\u0026this.rules.other.endPreScriptTag.test(t[0])\u0026\u0026(this.lexer.state.inRawBlock=!1),{type:\"html\",raw:t[0],inLink:this.lexer.state.inLink,inRawBlock:this.lexer.state.inRawBlock,block:!1,text:t[0]}}link(e){let t=this.rules.inline.link.exec(e);if(t){let n=t[2].trim();if(!this.options.pedantic\u0026\u0026this.rules.other.startAngleBracket.test(n)){if(!this.rules.other.endAngleBracket.test(n))return;let r=A(n.slice(0,-1),\"\\\\\");if((n.length-r.length)%2===0)return}else{let r=de(t[2],\"()\");if(r===-2)return;if(r\u003e-1){let a=(t[0].indexOf(\"!\")===0?5:4)+t[1].length+r;t[2]=t[2].substring(0,r),t[0]=t[0].substring(0,a).trim(),t[3]=\"\"}}let s=t[2],i=\"\";if(this.options.pedantic){let r=this.rules.other.pedanticHrefTitle.exec(s);r\u0026\u0026(s=r[1],i=r[3])}else i=t[3]?t[3].slice(1,-1):\"\";return s=s.trim(),this.rules.other.startAngleBracket.test(s)\u0026\u0026(this.options.pedantic\u0026\u0026!this.rules.other.endAngleBracket.test(n)?s=s.slice(1):s=s.slice(1,-1)),me(t,{href:s\u0026\u0026s.replace(this.rules.inline.anyPunctuation,\"$1\"),title:i\u0026\u0026i.replace(this.rules.inline.anyPunctuation,\"$1\")},t[0],this.lexer,this.rules)}}reflink(e,t){let n;if((n=this.rules.inline.reflink.exec(e))||(n=this.rules.inline.nolink.exec(e))){let s=(n[2]||n[1]).replace(this.rules.other.multipleSpaceGlobal,\" \"),i=t[s.toLowerCase()];if(!i){let r=n[0].charAt(0);return{type:\"text\",raw:r,text:r}}return me(n,i,n[0],this.lexer,this.rules)}}emStrong(e,t,n=\"\"){let s=this.rules.inline.emStrongLDelim.exec(e);if(!s||s[3]\u0026\u0026n.match(this.rules.other.unicodeAlphaNumeric))return;if(!(s[1]||s[2]||\"\")||!n||this.rules.inline.punctuation.exec(n)){let r=[...s[0]].length-1,o,a,c=r,p=0,u=s[0][0]===\"*\"?this.rules.inline.emStrongRDelimAst:this.rules.inline.emStrongRDelimUnd;for(u.lastIndex=0,t=t.slice(-1*e.length+r);(s=u.exec(t))!=null;){if(o=s[1]||s[2]||s[3]||s[4]||s[5]||s[6],!o)continue;if(a=[...o].length,s[3]||s[4]){c+=a;continue}else if((s[5]||s[6])\u0026\u0026r%3\u0026\u0026!((r+a)%3)){p+=a;continue}if(c-=a,c\u003e0)continue;a=Math.min(a,a+c+p);let d=[...s[0]][0].length,g=e.slice(0,r+s.index+d+a);if(Math.min(r,a)%2){let f=g.slice(1,-1);return{type:\"em\",raw:g,text:f,tokens:this.lexer.inlineTokens(f)}}let T=g.slice(2,-2);return{type:\"strong\",raw:g,text:T,tokens:this.lexer.inlineTokens(T)}}}}codespan(e){let t=this.rules.inline.code.exec(e);if(t){let n=t[2].replace(this.rules.other.newLineCharGlobal,\" \"),s=this.rules.other.nonSpaceChar.test(n),i=this.rules.other.startingSpaceChar.test(n)\u0026\u0026this.rules.other.endingSpaceChar.test(n);return s\u0026\u0026i\u0026\u0026(n=n.substring(1,n.length-1)),{type:\"codespan\",raw:t[0],text:n}}}br(e){let t=this.rules.inline.br.exec(e);if(t)return{type:\"br\",raw:t[0]}}del(e){let t=this.rules.inline.del.exec(e);if(t)return{type:\"del\",raw:t[0],text:t[2],tokens:this.lexer.inlineTokens(t[2])}}autolink(e){let t=this.rules.inline.autolink.exec(e);if(t){let n,s;return t[2]===\"@\"?(n=t[1],s=\"mailto:\"+n):(n=t[1],s=n),{type:\"link\",raw:t[0],text:n,href:s,tokens:[{type:\"text\",raw:n,text:n}]}}}url(e){let t;if(t=this.rules.inline.url.exec(e)){let n,s;if(t[2]===\"@\")n=t[0],s=\"mailto:\"+n;else{let i;do i=t[0],t[0]=this.rules.inline._backpedal.exec(t[0])?.[0]??\"\";while(i!==t[0]);n=t[0],t[1]===\"www.\"?s=\"http://\"+t[0]:s=t[0]}return{type:\"link\",raw:t[0],text:n,href:s,tokens:[{type:\"text\",raw:n,text:n}]}}}inlineText(e){let t=this.rules.inline.text.exec(e);if(t){let n=this.lexer.state.inRawBlock;return{type:\"text\",raw:t[0],text:t[0],escaped:n}}}};var x=class l{tokens;options;state;tokenizer;inlineQueue;constructor(e){this.tokens=[],this.tokens.links=Object.create(null),this.options=e||w,this.options.tokenizer=this.options.tokenizer||new S,this.tokenizer=this.options.tokenizer,this.tokenizer.options=this.options,this.tokenizer.lexer=this,this.inlineQueue=[],this.state={inLink:!1,inRawBlock:!1,top:!0};let t={other:m,block:B.normal,inline:P.normal};this.options.pedantic?(t.block=B.pedantic,t.inline=P.pedantic):this.options.gfm\u0026\u0026(t.block=B.gfm,this.options.breaks?t.inline=P.breaks:t.inline=P.gfm),this.tokenizer.rules=t}static get rules(){return{block:B,inline:P}}static lex(e,t){return new l(t).lex(e)}static lexInline(e,t){return new l(t).inlineTokens(e)}lex(e){e=e.replace(m.carriageReturn,`",
+          "Why": "command string is constructed, not a literal — injection surface"
+        },
+        {
+          "RuleID": "VX-SEC-003",
+          "Title": "shell command built from non-literal input",
+          "Severity": "high",
+          "File": "src/adeu/assets/marked.min.js",
+          "Line": 47,
+          "Snippet": "`+s.text,this.inlineQueue.pop(),this.inlineQueue.at(-1).src=r.text):t.push(s);continue}if(e){let r=\"Infinite loop on byte: \"+e.charCodeAt(0);if(this.options.silent){console.error(r);break}else throw new Error(r)}}return this.state.top=!0,t}inline(e,t=[]){return this.inlineQueue.push({src:e,tokens:t}),t}inlineTokens(e,t=[]){let n=e,s=null;if(this.tokens.links){let o=Object.keys(this.tokens.links);if(o.length\u003e0)for(;(s=this.tokenizer.rules.inline.reflinkSearch.exec(n))!=null;)o.includes(s[0].slice(s[0].lastIndexOf(\"[\")+1,-1))\u0026\u0026(n=n.slice(0,s.index)+\"[\"+\"a\".repeat(s[0].length-2)+\"]\"+n.slice(this.tokenizer.rules.inline.reflinkSearch.lastIndex))}for(;(s=this.tokenizer.rules.inline.anyPunctuation.exec(n))!=null;)n=n.slice(0,s.index)+\"++\"+n.slice(this.tokenizer.rules.inline.anyPunctuation.lastIndex);for(;(s=this.tokenizer.rules.inline.blockSkip.exec(n))!=null;)n=n.slice(0,s.index)+\"[\"+\"a\".repeat(s[0].length-2)+\"]\"+n.slice(this.tokenizer.rules.inline.blockSkip.lastIndex);let i=!1,r=\"\";for(;e;){i||(r=\"\"),i=!1;let o;if(this.options.extensions?.inline?.some(c=\u003e(o=c.call({lexer:this},e,t))?(e=e.substring(o.raw.length),t.push(o),!0):!1))continue;if(o=this.tokenizer.escape(e)){e=e.substring(o.raw.length),t.push(o);continue}if(o=this.tokenizer.tag(e)){e=e.substring(o.raw.length),t.push(o);continue}if(o=this.tokenizer.link(e)){e=e.substring(o.raw.length),t.push(o);continue}if(o=this.tokenizer.reflink(e,this.tokens.links)){e=e.substring(o.raw.length);let c=t.at(-1);o.type===\"text\"\u0026\u0026c?.type===\"text\"?(c.raw+=o.raw,c.text+=o.text):t.push(o);continue}if(o=this.tokenizer.emStrong(e,n,r)){e=e.substring(o.raw.length),t.push(o);continue}if(o=this.tokenizer.codespan(e)){e=e.substring(o.raw.length),t.push(o);continue}if(o=this.tokenizer.br(e)){e=e.substring(o.raw.length),t.push(o);continue}if(o=this.tokenizer.del(e)){e=e.substring(o.raw.length),t.push(o);continue}if(o=this.tokenizer.autolink(e)){e=e.substring(o.raw.length),t.push(o);continue}if(!this.state.inLink\u0026\u0026(o=this.tokenizer.url(e))){e=e.substring(o.raw.length),t.push(o);continue}let a=e;if(this.options.extensions?.startInline){let c=1/0,p=e.slice(1),u;this.options.extensions.startInline.forEach(d=\u003e{u=d.call({lexer:this},p),typeof u==\"number\"\u0026\u0026u\u003e=0\u0026\u0026(c=Math.min(c,u))}),c\u003c1/0\u0026\u0026c\u003e=0\u0026\u0026(a=e.substring(0,c+1))}if(o=this.tokenizer.inlineText(a)){e=e.substring(o.raw.length),o.raw.slice(-1)!==\"_\"\u0026\u0026(r=o.raw.slice(-1)),i=!0;let c=t.at(-1);c?.type===\"text\"?(c.raw+=o.raw,c.text+=o.text):t.push(o);continue}if(e){let c=\"Infinite loop on byte: \"+e.charCodeAt(0);if(this.options.silent){console.error(c);break}else throw new Error(c)}}return t}};var $=class{options;parser;constructor(e){this.options=e||w}space(e){return\"\"}code({text:e,lang:t,escaped:n}){let s=(t||\"\").match(m.notSpaceStart)?.[0],i=e.replace(m.endingNewline,\"\")+`",
+          "Why": "command string is constructed, not a literal — injection surface"
         }
       ]
     }

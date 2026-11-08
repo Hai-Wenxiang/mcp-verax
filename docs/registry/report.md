@@ -1,6 +1,6 @@
 # Verax Ecosystem Report
 
-_As of 2026-11-08 · 1 pulse · 29 unique packages · mean score 83.6_
+_As of 2026-11-08 · 1 pulse · 30 unique packages · mean score 81.5_
 
 ## Score distribution (latest pulse per package)
 
@@ -9,18 +9,18 @@ _As of 2026-11-08 · 1 pulse · 29 unique packages · mean score 83.6_
 | 90-100 | 21 |
 | 80-89 | 3 |
 | 60-79 | 1 |
-| 0-59 | 4 |
+| 0-59 | 5 |
 
 ## Findings by severity (all pulses)
 
-critical **7** · high **58** · medium **154** · low **17** · total **236**
+critical **7** · high **66** · medium **154** · low **17** · total **244**
 
 ## Most prevalent rules
 
 | Rule | Severity | Hits |
 |---|---|---|
 | `VX-SEC-008` outbound request to non-literal URL without allowlist | medium | 107 |
-| `VX-SEC-003` shell command built from non-literal input | high | 41 |
+| `VX-SEC-003` shell command built from non-literal input | high | 49 |
 | `VX-PRV-303` credentials written to logs | medium | 37 |
 | `VX-SEC-001` env dependency-injection default (review outputs) | medium | 17 |
 | `VX-SEC-002` filesystem write to non-literal path | high | 16 |
@@ -35,13 +35,13 @@ critical **7** · high **58** · medium **154** · low **17** · total **236**
 | `affiliate-networks-mcp@0.19.0` | 0 | 4/34 |
 | `@aetherya/mcp@1.0.5` | 0 | 2/4 |
 | `@adeu/mcp-server@1.7.1` | 0 | 0/12 |
+| `pypi:adeu@1.5.2` | 20 | 0/8 |
 | `@aetherwealth/mcp@0.2.9` | 23 | 1/4 |
 | `@2kw/ai-mcp-server@8.0.3` | 61 | 0/3 |
 | `@achromat-ai/mcp-server@0.1.4` | 82 | 0/1 |
-| `adtest-mcp@1.1.0` | 88 | 0/0 |
 | `@extremely-agency/mcp@0.1.1` | 88 | 0/0 |
+| `adtest-mcp@1.1.0` | 88 | 0/0 |
 | `pretrip-mcp@1.0.1` | 95 | 0/0 |
-| `@agent-bev/mcp-server@0.2.6` | 96 | 0/0 |
 
 ## Trend (packages with ≥2 pulses)
 
