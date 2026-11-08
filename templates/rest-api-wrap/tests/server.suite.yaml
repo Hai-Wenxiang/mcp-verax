@@ -1,0 +1,43 @@
+# Embedded Verax suite for the rest-api-wrap template.
+# Fully offline: demo.js serves a stub API + spec and proxies stdio.
+# Run from the repo root:  verax test templates/rest-api-wrap/tests/server.suite.yaml
+suite: rest-api-wrap-template
+target:
+  command: node templates/rest-api-wrap/demo.js
+  timeout_startup_ms: 30000
+case:
+  - name: tool catalogue from spec
+    expect:
+      tools.list.includes: [list_users, get_user, create_user]
+      tools.list.schema_valid: true
+  - name: list users round trip
+    call: list_users
+    expect:
+      ok: true
+      result.contains: ["alice", "status 200"]
+  - name: path param + single fetch
+    call: get_user
+    args: {id: "1"}
+    expect:
+      ok: true
+      result.contains: ["alice"]
+  - name: post body round trip
+    call: create_user
+    args: {name: "carol", role: "dev"}
+    expect:
+      ok: true
+      result.contains: ["status 201", "carol"]
+  - name: 404 surfaces as clean tool result
+    call: get_user
+    args: {id: "99"}
+    expect:
+      ok: true
+      result.contains: ["status 404"]
+  - name: allowlist blocks non-listed host
+    env: {ALLOWED_HOSTS: "example.invalid"}
+    call: list_users
+    expect:
+      is_error: true
+      error.contains: "host not allowed"
+leak:
+  process_exit: true

@@ -67,3 +67,9 @@ jobs:
         with:
           mode: test
           files: templates/notes-store/tests/server.suite.yaml
+
+      - name: Test the rest-api-wrap template via composite action
+        uses: ./
+        with:
+          mode: test
+          files: templates/rest-api-wrap/tests/server.suite.yaml

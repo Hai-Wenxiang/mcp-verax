@@ -72,7 +72,8 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 | notes-store template | ✅ Done | zero-dep CRUD, id sanitize + caps; suite 8/8, self-scan 100/100 |
 | `verax new` scaffolder | ✅ Done | templates embedded in binary; scaffold→cd→suite e2e green |
 | VX-DYN-201 SSRF probe (suite-level dynamic) | ✅ Done | honeyport + string-arg injection; e2e on official everything (17 tools, 0 hits) |
-| next templates (rest-api-wrap, db-readonly, …) | ⬜ Next | |
+| rest-api-wrap template | ✅ Done | zero-dep OpenAPI subset + offline demo harness; suite 7/7 (path/body/404/allowlist) |
+| next templates (db-readonly, web-fetch, …) | ⬜ Next | |
 
 ## M1 addendum: HTTP targets (2026-11-08 evening)
 

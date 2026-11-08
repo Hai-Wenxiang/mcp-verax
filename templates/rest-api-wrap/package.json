@@ -1,0 +1,20 @@
+{
+  "name": "rest-api-wrap-template",
+  "version": "0.1.0",
+  "description": "Verax template: wrap an OpenAPI-described REST API as MCP tools, allowlist-enforced.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hai-Wenxiang/mcp-verax"
+  },
+  "type": "module",
+  "bin": { "rest-api-wrap": "./index.js" },
+  "verax-template": {
+    "id": "rest-api-wrap",
+    "variables": [
+      { "name": "OPENAPI_URL", "desc": "URL of the OpenAPI spec (or OPENAPI_FILE)", "default": "" },
+      { "name": "ALLOWED_HOSTS", "desc": "comma-separated allowed API hosts", "default": "" },
+      { "name": "VERAX_MAX_OPS", "desc": "max operations exposed", "default": "30" }
+    ]
+  }
+}
