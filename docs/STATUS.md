@@ -16,7 +16,19 @@
 | F6 Schema-driven fuzzing + injection dictionaries | ✅ Done | seeded/deterministic; crash aborts campaign; inert dictionary |
 | F7 Reporters (JUnit XML, static HTML) | ✅ Done | single-file HTML; CLI --junit/--html; flags-after-files fixed |
 | F8 GitHub Action + release pipeline | ✅ Done | composite action + self-test workflow + tag→5-platform release |
-| F9 Bootstrap E2E + first compatibility report | ⬜ Planned | stretch; action-test workflow already self-hosts the example suite |
+| F9 Bootstrap E2E + first compatibility report | ✅ Done | 4 official servers driven; 2 Verax bugs found+fixed; F-2 server bug isolated (see compat/FINDINGS.md) |
+
+## Current Milestone: M2 — Verax Scanner / 当前里程碑：M2 Scanner
+
+| Feature | Status | Notes |
+|---|---|---|
+| S1 Engine core (findings/severity/score/walk) + QUA-105/106 | ✅ Done | 25/10/4/1 weights, floor 0 |
+| S2 VX-SEC-004 eval + VX-SEC-005 credential literals | ✅ Done | 7 credential shapes, masked snippets |
+| S3 VX-SEC-001 whole-env exposure + VX-SEC-003 shell construction | ✅ Done | negative-lookahead-free bare-env detection |
+| S4 VX-SEC-012 install hooks + VX-SEC-011 typosquat | ✅ Done | edit distance 1(high)/2(medium) |
+| S5 npm pack targets (audit the published artifact) | ✅ Done | array+object npm JSON; escape-proof tar |
+| S6 SARIF 2.1.0 + `verax scan` CLI + e2e | ✅ Done | real scans: memory 96/100, everything 71/100 |
+| S7+ More rules (PRV pack, SEC-002/008), scan Action, badge | ⬜ Next | |
 
 Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 
@@ -36,3 +48,7 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
   runner/CLI, SLO, leak/hang, fuzz, JUnit/HTML reporters, Action+release.
 - 2026-11-08 — **v0.1.0 released**: CI gate green (ci ×3OS + action-test ×2OS);
   5-platform binaries + SHA256SUMS published via release pipeline.
+- 2026-11-08 — F9 compat bootstrap: 4 official servers, 2 Verax bug fixes
+  (capability-gated discovery, handshake stderr), F-2/F-3 findings documented.
+- 2026-11-08 — **M2 Scanner core (S1–S6)**: engine + 8 rules + SARIF +
+  npm-artifact targets; real-package e2e on official servers.
