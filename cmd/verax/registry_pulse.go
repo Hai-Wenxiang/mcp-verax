@@ -41,6 +41,9 @@ type regPage struct {
 
 var npmNameRe = regexp.MustCompile(`^(@[a-z0-9-~][a-z0-9-._~]*/)?[a-z0-9-~][a-z0-9-._~]*$`)
 var crateNameRe = regexp.MustCompile(`^[a-zA-Z0-9_-]{1,64}$`)
+var pypiNameRe = regexp.MustCompile(`^[a-zA-Z0-9._-]{1,100}$`)
+
+func pypiNameOK(s string) bool { return pypiNameRe.MatchString(s) }
 
 // runRegistryPulse implements
 // `verax registry-pulse [--pages N] [--sample N] [--out dir] [--registry URL]`.
@@ -50,6 +53,7 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 	pages := fs.Int("pages", 3, "registry pages to pull (30 entries each)")
 	sample := fs.Int("sample", 10, "max npm entries to scan")
 	sampleCrates := fs.Int("sample-crates", 5, "max crates.io entries to scan")
+	samplePyPI := fs.Int("sample-pypi", 5, "max pypi entries to scan")
 	outDir := fs.String("out", "docs/registry", "output directory for pulse reports")
 	registry := fs.String("registry", "https://registry.modelcontextprotocol.io", "registry base URL")
 	jobs := fs.Int("j", 4, "concurrent package scans")
@@ -94,8 +98,8 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 		fmt.Fprintf(stdout, "registry: full walk pulled %d entries\n", len(entries))
 	}
 
-	// 2) pick npm + crates.io packaged entries (deterministic: name order)
-	var npmEntries, crateEntries []regEntry
+	// 2) pick npm + crates.io + pypi packaged entries (deterministic: name order)
+	var npmEntries, crateEntries, pypiEntries []regEntry
 	for _, e := range entries {
 		for _, pkg := range e.Server.Packages {
 			if pkg.RegistryType == "npm" && npmNameRe.MatchString(pkg.Identifier) {
@@ -106,19 +110,27 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 				crateEntries = append(crateEntries, e)
 				break
 			}
+			if pkg.RegistryType == "pypi" && pypiNameOK(pkg.Identifier) {
+				pypiEntries = append(pypiEntries, e)
+				break
+			}
 		}
 	}
 	npmEntries = dedupeHighestVersion(npmEntries)
 	crateEntries = dedupeHighestVersion(crateEntries)
+	pypiEntries = dedupeHighestVersion(pypiEntries)
 	if len(npmEntries) > *sample {
 		npmEntries = npmEntries[:*sample]
 	}
 	if len(crateEntries) > *sampleCrates {
 		crateEntries = crateEntries[:*sampleCrates]
 	}
+	if len(pypiEntries) > *samplePyPI {
+		pypiEntries = pypiEntries[:*samplePyPI]
+	}
 
-	fmt.Fprintf(stdout, "registry: %d entries pulled, %d npm-packaged, %d crate-packaged, scanning %d+%d\n",
-		len(entries), len(npmEntries), len(crateEntries), len(npmEntries), len(crateEntries))
+	fmt.Fprintf(stdout, "registry: %d entries pulled, %d npm-packaged, %d crate-packaged, %d pypi-packaged, scanning %d+%d+%d\n",
+		len(entries), len(npmEntries), len(crateEntries), len(pypiEntries), len(npmEntries), len(crateEntries), len(pypiEntries))
 
 	// 3) scan each entry (published artifact; npm via `npm pack`, crates via
 	// the crates.io download API)
@@ -126,7 +138,7 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 		name string
 		spec string // fetch spec as passed to the fetcher
 		disp string // package display string written into the report
-		kind string // "npm" | "crate"
+		kind string // "npm" | "crate" | "pypi"
 	}
 	var targets []scanTarget
 	for _, e := range npmEntries {
@@ -144,6 +156,14 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 			spec += "@" + pkg.Version
 		}
 		targets = append(targets, scanTarget{name: e.Server.Name, spec: spec, disp: spec, kind: "crate"})
+	}
+	for _, e := range pypiEntries {
+		pkg := e.Server.Packages[0]
+		spec := "pypi:" + pkg.Identifier
+		if pkg.Version != "" {
+			spec += "@" + pkg.Version
+		}
+		targets = append(targets, scanTarget{name: e.Server.Name, spec: spec, disp: spec, kind: "pypi"})
 	}
 
 	type row struct {
@@ -170,9 +190,12 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 			var root string
 			var cleanup func()
 			var err error
-			if tg.kind == "crate" {
+			switch tg.kind {
+			case "crate":
 				root, cleanup, err = scanner.FetchCratePackage(tg.spec)
-			} else {
+			case "pypi":
+				root, cleanup, err = scanner.FetchPyPIPackage(tg.spec)
+			default:
 				root, cleanup, err = scanner.FetchNPMPackage(tg.spec)
 			}
 			if err != nil {
@@ -204,13 +227,14 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 	}
 	date := time.Now().UTC().Format("2006-01-02")
 	report := struct {
-		Date     string `json:"date"`
-		Entries  int    `json:"entries_pulled"`
-		NpmTotal int    `json:"npm_packaged"`
-		Crates   int    `json:"crate_packaged"`
-		Scanned  int    `json:"scanned"`
-		Rows     []row  `json:"rows"`
-	}{Date: date, Entries: len(entries), NpmTotal: countNpm(entries), Crates: countCrate(entries), Scanned: len(rows), Rows: rows}
+		Date      string `json:"date"`
+		Entries   int    `json:"entries_pulled"`
+		NpmTotal  int    `json:"npm_packaged"`
+		Crates    int    `json:"crate_packaged"`
+		PyPITotal int    `json:"pypi_packaged"`
+		Scanned   int    `json:"scanned"`
+		Rows      []row  `json:"rows"`
+	}{Date: date, Entries: len(entries), NpmTotal: countNpm(entries), Crates: countCrate(entries), PyPITotal: countPyPI(entries), Scanned: len(rows), Rows: rows}
 	raw, _ := json.MarshalIndent(report, "", "  ")
 	jsonPath := *outDir + "/pulse-" + date + ".json"
 	if err := os.WriteFile(jsonPath, raw, 0o644); err != nil {
@@ -226,7 +250,7 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 	mdPath := *outDir + "/pulse-" + date + ".md"
 	var b strings.Builder
 	fmt.Fprintf(&b, "# Registry Pulse — %s\n\n", date)
-	fmt.Fprintf(&b, "Official registry entries pulled: **%d** · npm-packaged: **%d** · crate-packaged: **%d** · scanned: **%d**\n\n", report.Entries, report.NpmTotal, report.Crates, report.Scanned)
+	fmt.Fprintf(&b, "Official registry entries pulled: **%d** · npm-packaged: **%d** · crate-packaged: **%d** · pypi-packaged: **%d** · scanned: **%d**\n\n", report.Entries, report.NpmTotal, report.Crates, report.PyPITotal, report.Scanned)
 	fmt.Fprintf(&b, "| Server | Package | Registry | Score | Findings |\n|---|---|---|---|---|\n")
 	for _, r := range rows {
 		score := fmt.Sprintf("%d", r.Score)
@@ -309,6 +333,19 @@ func countCrate(entries []regEntry) int {
 	for _, e := range entries {
 		for _, pkg := range e.Server.Packages {
 			if pkg.RegistryType == "crates.io" || pkg.RegistryType == "crate" {
+				n++
+				break
+			}
+		}
+	}
+	return n
+}
+
+func countPyPI(entries []regEntry) int {
+	n := 0
+	for _, e := range entries {
+		for _, pkg := range e.Server.Packages {
+			if pkg.RegistryType == "pypi" {
 				n++
 				break
 			}

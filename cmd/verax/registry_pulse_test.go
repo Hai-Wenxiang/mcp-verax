@@ -98,6 +98,9 @@ func TestCountCrate(t *testing.T) {
 	if n := countNpm(entries); n != 1 {
 		t.Fatalf("countNpm = %d, want 1", n)
 	}
+	if n := countPyPI(entries); n != 1 {
+		t.Fatalf("countPyPI = %d, want 1", n)
+	}
 }
 
 func TestRunRegistryPulseWritesLatestForBadge(t *testing.T) {
@@ -114,6 +117,7 @@ func TestRunRegistryPulseWritesLatestForBadge(t *testing.T) {
 		"--out", out,
 		"--retries", "1",
 		"--sample-crates", "0", // stay offline: crate fetches hit real crates.io
+		"--sample-pypi", "0", // ...and pypi fetches hit real PyPI
 	}, &stdout, &stderr)
 	if code != 0 {
 		t.Fatalf("exit %d, stderr:\n%s", code, stderr.String())
