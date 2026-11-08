@@ -32,7 +32,7 @@ self-scan 100/100 — the flywheel (template → suite-green → scan-clean) run
 | Component | What it does | Status |
 |---|---|---|
 | **Verax Test Kit** (`verax test`) | Declarative YAML test suites for MCP servers: handshake/primitive assertions, result snapshots, schema-driven fuzzing, latency SLOs, process-leak detection. Ships as a single Go binary. | ✅ shipped |
-| **Verax Scanner** (`verax scan`) | 16 rules (js/py/pkg) + osv.dev CVEs → SARIF, 0–100 score, `--min-score` / `--fail-level` CI gates. | ✅ shipped |
+| **Verax Scanner** (`verax scan`) | 18 rules (js/py/rs/pkg) + osv.dev CVEs → SARIF, 0–100 score, `--min-score` / `--fail-level` CI gates. | ✅ shipped |
 | **Verax Templates** (`verax new`) | 6 zero-dep scaffolds — filesystem-safe, csv-query, notes-store, rest-api-wrap, web-fetch-md, db-readonly — each suite-green and self-scan 100/100. | ✅ 6 templates · M3 productization next |
 | **Verax Registry Intelligence** | Registry pulse (nightly sample + weekly full walk) → live leaderboard, score badges, trend lines, [ecosystem report](https://hai-wenxiang.github.io/mcp-verax/report.html). | 🚧 live · [leaderboard](https://hai-wenxiang.github.io/mcp-verax/) |
 

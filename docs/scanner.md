@@ -22,7 +22,7 @@ verax scan . --badge b.svg --min-score 90 # SVG badge + score threshold
 
 Exit codes: `0` clean / low-only · `1` any critical or high · `2` usage.
 
-### Rule packs (16 rules, JS/TS + Python)
+### Rule packs (18 rules, JS/TS + Python + Rust)
 
 | Rule | Severity | Detects | Lang |
 |---|---|---|---|
