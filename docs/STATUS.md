@@ -41,7 +41,9 @@
 | pulse retry/backoff | ✅ Done | 3 attempts, linear backoff — live registry TLS flakiness hardened |
 | `verax scan --fail-level` gate | ✅ Done | severity-threshold exit (low/medium/high/critical), e2e verified |
 | leaderboard sparklines | ✅ Done | inline SVG score dots+polyline per package (grows from 2nd pulse) |
-| next: full-registry sampling | ⬜ Next | |
+| community fuzz corpus (corpus/fuzz/*.txt) | ✅ Done | embedded, PR-welcome, hygiene-enforced |
+| registry-pulse --all (full walk) | ✅ Done | page cap + polite throttle; live verified |
+| next: weekly full walk schedule | ⬜ Next | |
 
 Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 

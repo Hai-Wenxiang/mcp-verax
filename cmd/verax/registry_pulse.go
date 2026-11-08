@@ -51,6 +51,9 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 	outDir := fs.String("out", "docs/registry", "output directory for pulse reports")
 	registry := fs.String("registry", "https://registry.modelcontextprotocol.io", "registry base URL")
 	jobs := fs.Int("j", 4, "concurrent package scans")
+	all := fs.Bool("all", false, "pull every registry page (bounded by --max-pages)")
+	maxPages := fs.Int("max-pages", 100, "hard page cap even with --all")
+	pageDelay := fs.Duration("page-delay", 500*time.Millisecond, "throttle between registry pages")
 	timeout := fs.Duration("http-timeout", 30*time.Second, "registry HTTP timeout")
 	if err := fs.Parse(args); err != nil {
 		return 2
@@ -61,7 +64,11 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 	// 1) pull pages
 	var entries []regEntry
 	cursor := ""
-	for p := 0; p < *pages; p++ {
+	pageLimit := *pages
+	if *all {
+		pageLimit = *maxPages
+	}
+	for p := 0; p < pageLimit; p++ {
 		url := *registry + "/v0/servers?cursor=" + cursor
 		req, _ := http.NewRequest(http.MethodGet, url, nil)
 		req.Header.Set("Accept", "application/json")
@@ -82,6 +89,13 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 			break
 		}
 		cursor = page.Metadata.NextCursor
+		if *all {
+			// be a polite crawler when walking the whole registry
+			time.Sleep(*pageDelay)
+		}
+	}
+	if *all {
+		fmt.Fprintf(stdout, "registry: full walk pulled %d entries\n", len(entries))
 	}
 
 	// 2) pick npm-packaged entries (deterministic: name order)
