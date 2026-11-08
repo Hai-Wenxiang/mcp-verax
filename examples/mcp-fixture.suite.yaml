@@ -1,0 +1,32 @@
+# Example Verax suite — runs against the repo's own MCP fixture server.
+# Try it from the repo root:  go run ./cmd/verax test examples/mcp-fixture.suite.yaml
+suite: mcp-fixture-demo
+protocol: 2025-06-18
+target:
+  command: go run github.com/Hai-Wenxiang/mcp-verax/testfixtures/mcp
+  timeout_startup_ms: 60000
+before:
+  - initialize.ok
+case:
+  - name: tools catalogue is complete
+    expect:
+      tools.list.includes: [echo, fail, slow, env]
+      tools.list.exact: [echo, env, fail, slow]
+      tools.list.count: 4
+      tools.list.schema_valid: true
+      prompts.list.includes: [greet]
+      resources.list.min: 1
+
+  - name: echo returns its message
+    call: echo
+    args:
+      msg: "hello from verax example"
+    expect:
+      ok: true
+      result.contains: ["hello from verax example"]
+
+  - name: fail tool reports a tool-level error
+    call: fail
+    expect:
+      is_error: true
+      error.contains: "on purpose"
