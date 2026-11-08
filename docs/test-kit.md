@@ -85,13 +85,59 @@ verax test suite.yaml -u    # rewrite goldens (review the diff!)
 | Golden snapshots + `-u` | ✅ |
 | Latency SLO (p95, concurrency) | ✅ F5 |
 | Process-leak & hang detection | ✅ F5 |
-| Schema-driven fuzzing | F6 |
-| JUnit XML + HTML reports | F7 |
-| GitHub Action | F8 |
+| Schema-driven fuzzing | ✅ F6 |
+| JUnit XML + HTML reports | ✅ F7 |
+| GitHub Action | ✅ F8 |
+
+### Use in GitHub Actions
+
+```yaml
+- uses: Hai-Wenxiang/mcp-verax@main
+  with:
+    files: tests/*.suite.yaml
+    junit: verax-junit.xml
+    html: verax-report.html
+```
+
+The action fails the job on any suite failure and emits reports as artifacts.
+Until the first binary release, it builds the CLI from source with Go (~10s).
+
+### Fuzz block
+
+```yaml
+fuzz:
+  runs: 100          # total hostile calls (seeded, reproducible)
+  seed: 42
+  hang_ms: 5000      # per-call hang budget
+  tools: [echo]      # default: all tools
+```
+
+Tool-level error results (`isError`) are tolerated; transport/RPC failures
+count as **crashes**, budget overruns as **hangs**. The first crash aborts the
+campaign (a dead server would inflate every subsequent call into a crash).
+
+### SLO block
+
+```yaml
+slo:
+  tool: echo           # tool to hammer (required when budgets are set)
+  args: {msg: "hi"}
+  p95_call_ms: 800     # latency budget
+  concurrency: 4       # parallel callers
+  sample_calls: 20     # total samples (default 20)
+  success_rate: 1.0
+```
+
+### Leak block
+
+```yaml
+leak:
+  process_exit: true   # server must exit on stdin EOF within grace (3s)
+```
 
 ## 中文
 
-`verax test` 用声明式 YAML 套件对真实 MCP server（stdio 拉起）做回归测试，按用例输出 PASS/FAIL 与断言明细——本地看终端，CI 靠退出码，JUnit/HTML 报告器随后就到。
+`verax test` 用声明式 YAML 套件对真实 MCP server（stdio 拉起）做回归测试：断言/快照/延迟 SLO/进程泄漏/Schema 模糊测试一应俱全，终端 + JUnit XML + 单文件 HTML 三种报告，`--junit/--html` 落盘，GitHub Action 三行接入 CI。
 
 ### 快速开始
 

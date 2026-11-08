@@ -13,10 +13,10 @@
 | F3 Assertion engine (assertions + snapshots) | ✅ Done | 15 tests; jest-style golden snapshots |
 | F4 Runner + CLI (`verax test`) + terminal reporter | ✅ Done | shared/respawn modes; example suite smoke 3/3 |
 | F5 SLO (latency p95, concurrency) + process-leak + hang detection | ✅ Done | ns-precision timing; tree kill; leak(process_exit) case |
-| F6 Schema-driven fuzzing + injection dictionaries | ⬜ Planned | |
-| F7 Reporters (JUnit XML, static HTML) | ⬜ Planned | |
-| F8 GitHub Action + release pipeline | ⬜ Planned | |
-| F9 Bootstrap E2E + first compatibility report | ⬜ Planned | stretch |
+| F6 Schema-driven fuzzing + injection dictionaries | ✅ Done | seeded/deterministic; crash aborts campaign; inert dictionary |
+| F7 Reporters (JUnit XML, static HTML) | ✅ Done | single-file HTML; CLI --junit/--html; flags-after-files fixed |
+| F8 GitHub Action + release pipeline | ✅ Done | composite action + self-test workflow + tag→5-platform release |
+| F9 Bootstrap E2E + first compatibility report | ⬜ Planned | stretch; action-test workflow already self-hosts the example suite |
 
 Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 
@@ -32,3 +32,5 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 ## Changelog / 变更日志
 
 - 2026-11-08 — M1 development started. ADR-001 accepted: Test Kit in Go.
+- 2026-11-08 — F0–F8 complete: protocol client, DSL, assertions+snapshots,
+  runner/CLI, SLO, leak/hang, fuzz, JUnit/HTML reporters, Action+release.

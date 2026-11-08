@@ -1,0 +1,56 @@
+name: 'Verax MCP Test'
+description: >
+  Run Verax test suites (YAML) against MCP servers. Discovers *.suite.yaml
+  failures, snapshots, SLO/leak/fuzz blocks. Until the first binary release
+  ships, the action builds the verax CLI from this repository with Go.
+
+branding:
+  icon: 'check-circle'
+  color: 'green'
+
+inputs:
+  files:
+    description: 'Suite file(s) or glob, space-separated (e.g. "tests/*.suite.yaml")'
+    required: true
+  update-snapshots:
+    description: 'Accept changed/new snapshots (-u)'
+    required: false
+    default: 'false'
+  verbose:
+    description: 'Show passing checks too (-v)'
+    required: false
+    default: 'false'
+  junit:
+    description: 'Write JUnit XML report to this path'
+    required: false
+    default: ''
+  html:
+    description: 'Write single-file HTML report to this path'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: 'stable'
+        cache: false
+
+    - name: Build verax
+      shell: bash
+      run: |
+        go build -o "$RUNNER_TEMP/verax-bin/verax${{ runner.os == 'Windows' && '.exe' || '' }}" ./cmd/verax
+      working-directory: ${{ github.action_path }}
+
+    - name: Run suites
+      shell: bash
+      run: |
+        set -euo pipefail
+        ARGS=()
+        if [ "${{ inputs.update-snapshots }}" = "true" ]; then ARGS+=("-u"); fi
+        if [ "${{ inputs.verbose }}" = "true" ]; then ARGS+=("-v"); fi
+        if [ -n "${{ inputs.junit }}" ]; then ARGS+=("--junit" "${{ inputs.junit }}"); fi
+        if [ -n "${{ inputs.html }}" ]; then ARGS+=("--html" "${{ inputs.html }}"); fi
+        "$RUNNER_TEMP/verax-bin/verax${{ runner.os == 'Windows' && '.exe' || '' }}" test "${ARGS[@]}" ${{ inputs.files }}

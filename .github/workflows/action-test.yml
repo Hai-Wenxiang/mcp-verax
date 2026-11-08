@@ -1,0 +1,38 @@
+name: action-test
+
+# Self-test of the composite action (action.yml): uses the repo itself as
+# the action under test against the example suite, on Linux and Windows.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  use-action:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run verax via composite action
+        uses: ./
+        with:
+          files: examples/mcp-fixture.suite.yaml
+          verbose: 'true'
+          junit: verax-junit.xml
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verax-reports-${{ matrix.os }}
+          path: verax-junit.xml
+          if-no-files-found: ignore
