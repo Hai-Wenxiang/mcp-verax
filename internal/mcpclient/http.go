@@ -28,10 +28,11 @@ type HTTPConfig struct {
 // per POST, response as JSON or a short SSE stream; Mcp-Session-Id echoed
 // when the server issues one. It mirrors the Client surface the runner uses.
 type HTTPClient struct {
-	cfg    HTTPConfig
-	http   *http.Client
-	info   InitializeResult
-	nextID int64
+	cfg       HTTPConfig
+	http      *http.Client
+	info      InitializeResult
+	nextID    int64
+	sessionID string // Mcp-Session-Id issued by the server, echoed on every call
 }
 
 // ConnectHTTP performs the initialize handshake against the remote server.
@@ -110,6 +111,9 @@ func (c *HTTPClient) post(ctx context.Context, msg map[string]any, wantResponse 
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json, text/event-stream")
+	if c.sessionID != "" {
+		req.Header.Set("Mcp-Session-Id", c.sessionID)
+	}
 	for k, v := range c.cfg.Headers {
 		req.Header.Set(k, v)
 	}
@@ -118,6 +122,12 @@ func (c *HTTPClient) post(ctx context.Context, msg map[string]any, wantResponse 
 		return nil, fmt.Errorf("mcpclient(http): post %s: %w", methodOf(msg), err)
 	}
 	defer resp.Body.Close()
+
+	// Stateful servers issue a session id (usually on initialize); echo it
+	// on every subsequent request per the Streamable HTTP spec.
+	if sid := resp.Header.Get("Mcp-Session-Id"); sid != "" {
+		c.sessionID = sid
+	}
 
 	if resp.StatusCode == http.StatusAccepted {
 		if wantResponse {

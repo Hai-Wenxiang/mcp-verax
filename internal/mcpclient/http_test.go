@@ -117,3 +117,19 @@ func containsStr(s, sub string) bool {
 	}
 	return false
 }
+
+func TestHTTPSessionIDEchoed(t *testing.T) {
+	base := startHTTPFixture(t, "MCP_SESSION=1")
+	c, err := ConnectHTTP(context.Background(), HTTPConfig{BaseURL: base, HandshakeTimeout: 30 * time.Second})
+	if err != nil {
+		t.Fatalf("handshake: %v", err)
+	}
+	defer c.Close()
+	if c.sessionID != "verax-fixture-session-1" {
+		t.Fatalf("session id not captured: %q", c.sessionID)
+	}
+	// Subsequent calls must echo the session id (server 404s otherwise).
+	if _, err := c.CallTool(context.Background(), "echo", map[string]any{"msg": "with session"}); err != nil {
+		t.Fatalf("call without proper session echo failed: %v", err)
+	}
+}

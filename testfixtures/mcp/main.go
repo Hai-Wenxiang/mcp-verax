@@ -283,6 +283,20 @@ func serveHTTP(addr string) {
 			return
 		}
 
+		// Session semantics (MCP_SESSION=1): issue a session id on the first
+		// request and require it echoed afterwards — exercises the client's
+		// Mcp-Session-Id handling.
+		session := "verax-fixture-session-1"
+		sent := r.Header.Get("Mcp-Session-Id")
+		if os.Getenv("MCP_SESSION") == "1" {
+			if sent == "" {
+				w.Header().Set("Mcp-Session-Id", session)
+			} else if sent != session {
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
+		}
+
 		var responses []map[string]any
 		for _, m := range msgs {
 			handleMessage(m, func(obj map[string]any) { responses = append(responses, obj) })
