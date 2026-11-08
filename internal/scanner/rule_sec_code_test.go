@@ -83,9 +83,10 @@ func TestVulnScoreDrops(t *testing.T) {
 		t.Fatal(err)
 	}
 	// 4 QUA Low (4) + 2 eval High + 4 secret High + 2 env Critical (50)
-	// + 2 shell High = 134 points of deductions → floored at 0.
-	if len(res.Findings) != 14 {
-		t.Errorf("findings = %d, want 14", len(res.Findings))
+	// + 2 shell High + 1 install Medium (4) + 1 typosquat Medium (4)
+	// = 142 points of deductions → floored at 0.
+	if len(res.Findings) != 16 {
+		t.Errorf("findings = %d, want 16", len(res.Findings))
 		for _, f := range res.Findings {
 			t.Logf("%s", f.Reason())
 		}
