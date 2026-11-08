@@ -95,3 +95,10 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 
 - 2026-11-08 — **v0.5.0 released**: side-effect probe, -j parallelism,
   pyproject/go.mod scanning, verax init, self-scan 100/100.
+
+### Day-1 final tally / 首日总账 (2026-11-08 20:00)
+
+- 75 commits · 5 releases (v0.1.0–v0.5.0) · 17 scanner rules · 6 templates
+- `verax` CLI: test (8 flags) / scan (6 flags) / init / new / rules
+- 45/45 suite cases green in parallel (-j 7); self-scan 100/100
+- Field evidence F-1..F-4 against official reference servers
