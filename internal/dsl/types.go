@@ -113,8 +113,13 @@ func (s *Suite) Validate() error {
 		problems = append(problems, "target: one of command (stdio) or url (http) is required")
 	case s.Target.Command != "" && s.Target.URL != "":
 		problems = append(problems, "target: command and url are mutually exclusive")
-	case s.Target.URL != "":
-		problems = append(problems, "target: url is not supported yet (use stdio command targets)")
+	}
+	if s.Target.URL != "" {
+		for i, c := range s.Cases {
+			if len(c.Env) > 0 {
+				problems = append(problems, fmt.Sprintf("case[%d] %q: per-case env requires a stdio command target", i, c.Name))
+			}
+		}
 	}
 	if s.Target.Command != "" {
 		if _, err := s.Target.CommandParts(); err != nil {

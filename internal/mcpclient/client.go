@@ -141,7 +141,9 @@ func (c *Client) handshake(ctx context.Context) error {
 	return nil
 }
 
-func (c *Client) versionSupported(v string) bool {
+func (c *Client) versionSupported(v string) bool { return versionSupported(v) }
+
+func versionSupported(v string) bool {
 	for _, s := range SupportedProtocolVersions {
 		if s == v {
 			return true

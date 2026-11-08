@@ -10,13 +10,12 @@ import (
 	"github.com/Hai-Wenxiang/mcp-verax/internal/assert"
 	"github.com/Hai-Wenxiang/mcp-verax/internal/dsl"
 	"github.com/Hai-Wenxiang/mcp-verax/internal/fuzz"
-	"github.com/Hai-Wenxiang/mcp-verax/internal/mcpclient"
 )
 
 // runFuzzCampaign fuzzes the server's tools with schema-driven hostile
 // arguments. Tool-level error results are tolerated; transport/RPC errors
 // count as crashes, budget overruns as hangs.
-func runFuzzCampaign(cli *mcpclient.Client, f dsl.Fuzz) (fuzz.Result, error) {
+func runFuzzCampaign(cli mcpConn, f dsl.Fuzz) (fuzz.Result, error) {
 	listCtx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	tools, err := cli.ListTools(listCtx)

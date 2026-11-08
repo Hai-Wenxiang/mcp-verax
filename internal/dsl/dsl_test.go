@@ -140,17 +140,22 @@ case:
 	}
 }
 
-func TestURLTargetNotYetSupported(t *testing.T) {
-	bad := `
+func TestURLTargetAcceptsButGuardsEnv(t *testing.T) {
+	ok := `
 suite: x
 target: {url: "https://example.com/mcp"}
 case:
   - name: a
     expect: {tools.list.includes: [x]}
 `
-	_, err := Parse([]byte(bad), "url.yaml")
-	if err == nil || !strings.Contains(err.Error(), "url is not supported yet") {
-		t.Errorf("url target should be rejected for now: %v", err)
+	if _, err := Parse([]byte(ok), "url-ok.yaml"); err != nil {
+		t.Errorf("plain url target must parse: %v", err)
+	}
+
+	bad := strings.Replace(ok, "expect:", "env: {A: \"1\"}\n    expect:", 1)
+	_, err := Parse([]byte(bad), "url-env.yaml")
+	if err == nil || !strings.Contains(err.Error(), "per-case env requires a stdio command target") {
+		t.Errorf("url + per-case env must be rejected: %v", err)
 	}
 }
 

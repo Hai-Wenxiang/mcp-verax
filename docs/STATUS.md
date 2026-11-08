@@ -57,3 +57,9 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
   npm-artifact targets; real-package e2e on official servers.
 - 2026-11-08 — M2 S7–S9: privacy/outbound rules, Action scan mode, Python
   pack + language-aware dispatch — **16 rules**, all gates green.
+
+## M1 addendum: HTTP targets (2026-11-08 evening)
+
+| Feature | Status | Notes |
+|---|---|---|
+| S13 Streamable HTTP transport for test suites | ✅ Done | POST subset (JSON+SSE), fixture HTTP mode, url-target e2e green |

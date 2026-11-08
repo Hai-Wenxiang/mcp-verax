@@ -28,9 +28,11 @@ verax test path/to/your.suite.yaml -v
 suite: my-server                      # required name
 protocol: 2025-06-18                  # optional: 2025-06-18 | 2025-03-26 | 2024-11-05
 target:
-  command: npx -y "@scope/mcp-server" # stdio launch (quotes honoured)
+  command: npx -y "@scope/mcp-server" # stdio launch (quotes honoured) — or:
+  # url: https://remote.example.com   # remote Streamable HTTP target
+  # headers: {authorization: "Bearer ${TOKEN}"}
   env: {API_TOKEN: "${MY_TOKEN}"}     # ${VAR} expanded from environment
-  timeout_startup_ms: 15000           # spawn + initialize budget (default 15000)
+  timeout_startup_ms: 15000           # spawn/connect + initialize budget (default 15000)
 before:                               # probes before cases
   - initialize.ok
 case:
@@ -62,6 +64,7 @@ Execution model / 执行模型:
 
 - **Shared mode** (default): one long-lived server process for the whole suite — fast, realistic.
 - **Respawn mode**: any case with `env:` forces a fresh server per case (fault injection isolation).
+- **HTTP mode**: `target.url` suites run against a remote Streamable HTTP server (POST subset: JSON + SSE responses, session header echo); per-case env and process-leak checks do not apply remotely.
 
 Exit codes: `0` all pass · `1` any failure · `2` usage error.
 

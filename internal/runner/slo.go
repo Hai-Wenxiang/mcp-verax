@@ -10,7 +10,6 @@ import (
 
 	"github.com/Hai-Wenxiang/mcp-verax/internal/assert"
 	"github.com/Hai-Wenxiang/mcp-verax/internal/dsl"
-	"github.com/Hai-Wenxiang/mcp-verax/internal/mcpclient"
 )
 
 // SLOResult carries latency/stability measurements for one SLO block.
@@ -40,7 +39,7 @@ func (r SLOResult) Checks() []assert.CheckResult {
 
 // runSLO hammers slo.Tool with samples calls across concurrency workers and
 // evaluates the budgets. Per-call ceiling is 30s regardless of budget.
-func runSLO(cli *mcpclient.Client, slo dsl.SLO) SLOResult {
+func runSLO(cli mcpConn, slo dsl.SLO) SLOResult {
 	samples := orDefault(slo.SampleCalls, 20)
 	conc := orDefault(slo.Concurrency, 1)
 	res := SLOResult{Tool: slo.Tool, Samples: samples, Concurrency: conc}

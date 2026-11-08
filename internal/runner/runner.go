@@ -29,6 +29,19 @@ const (
 	StatusError Status = "error"
 )
 
+// mcpConn is the connection surface the runner needs; implemented by both
+// the stdio Client and the HTTPClient.
+type mcpConn interface {
+	InitializeResult() mcpclient.InitializeResult
+	ListTools(ctx context.Context) (*mcpclient.ToolsResult, error)
+	ListResources(ctx context.Context) (*mcpclient.ResourcesResult, error)
+	ListPrompts(ctx context.Context) (*mcpclient.PromptsResult, error)
+	CallTool(ctx context.Context, name string, arguments map[string]any) (*mcpclient.CallToolResult, error)
+	Close() error
+	CleanExit() bool
+	Stderr() []string
+}
+
 // Options tune a run.
 type Options struct {
 	UpdateSnapshots bool
@@ -109,6 +122,10 @@ func RunSuite(s *dsl.Suite, opts Options) *SuiteReport {
 
 	leakCheck := s.Leak != nil && s.Leak.ProcessExit
 
+	if s.Target.URL != "" {
+		return runHTTPSuite(s, opts, store, report)
+	}
+
 	if anyCaseEnv(s) {
 		// Respawn mode: fresh server per case (per-case env isolation).
 		leaks := 0
@@ -170,6 +187,44 @@ func RunSuite(s *dsl.Suite, opts Options) *SuiteReport {
 			leaks = 1
 		}
 		report.Cases = append(report.Cases, leakCaseResult(1, leaks))
+	}
+	return report
+}
+
+// runHTTPSuite executes a url-target suite against a remote Streamable HTTP
+// server: one shared connection for all cases; no respawn (per-case env is
+// rejected at validation) and no process-leak semantics.
+func runHTTPSuite(s *dsl.Suite, opts Options, store *assert.SnapshotStore, report *SuiteReport) *SuiteReport {
+	timeout := 15 * time.Second
+	if s.Target.StartupTimeoutMS > 0 {
+		timeout = time.Duration(s.Target.StartupTimeoutMS) * time.Millisecond
+	}
+	conn, err := mcpclient.ConnectHTTP(context.Background(), mcpclient.HTTPConfig{
+		BaseURL:          s.Target.URL,
+		Headers:          s.Target.Headers,
+		HandshakeTimeout: timeout,
+		CallTimeout:      time.Duration(orDefault(opts.DefaultCallMS, 60000)) * time.Millisecond,
+	})
+	if err != nil {
+		report.Cases = []CaseResult{{Name: "(suite)", Status: StatusError, Err: "connect http: " + err.Error()}}
+		return report
+	}
+	defer func() { _ = conn.Close() }()
+
+	for _, c := range s.Cases {
+		report.Cases = append(report.Cases, runCase(conn, c, store, opts))
+	}
+	if s.SLO != nil && s.SLO.Tool != "" {
+		res := runSLO(conn, *s.SLO)
+		report.Cases = append(report.Cases, CaseResult{
+			Name:   "slo(" + s.SLO.Tool + ")",
+			Status: statusFromChecks(res.Checks()),
+			Checks: res.Checks(),
+		})
+	}
+	if s.Fuzz != nil && s.Fuzz.Runs > 0 {
+		fres, ferr := runFuzzCampaign(conn, *s.Fuzz)
+		report.Cases = append(report.Cases, fuzzCaseResult(fres, ferr))
 	}
 	return report
 }
@@ -255,7 +310,7 @@ func spawnGrace(s *dsl.Suite, extraEnv map[string]string, closeGrace int) (*mcpc
 	}, mcpclient.Options{HandshakeTimeout: timeout})
 }
 
-func runCase(cli *mcpclient.Client, c dsl.Case, store *assert.SnapshotStore, opts Options) CaseResult {
+func runCase(cli mcpConn, c dsl.Case, store *assert.SnapshotStore, opts Options) CaseResult {
 	res := CaseResult{Name: c.Name}
 	start := time.Now()
 	defer func() { res.DurationMS = time.Since(start).Milliseconds() }()
@@ -301,7 +356,7 @@ func runCase(cli *mcpclient.Client, c dsl.Case, store *assert.SnapshotStore, opt
 // gated by the advertised capability and tolerates -32601 (method not found)
 // as "primitive absent". Official reference servers (e.g. the filesystem
 // server) legitimately implement only a subset of tools/resources/prompts.
-func discover(ctx context.Context, cli *mcpclient.Client) (assert.Discovery, error) {
+func discover(ctx context.Context, cli mcpConn) (assert.Discovery, error) {
 	disc := assert.Discovery{HandshakeOK: true}
 	caps := cli.InitializeResult().Capabilities
 
