@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Hai-Wenxiang/mcp-verax/internal/report"
@@ -54,6 +55,7 @@ func runTest(args []string, stdout, stderr io.Writer) int {
 	verbose := fs.Bool("v", false, "show passing checks too")
 	watch := fs.Bool("watch", false, "re-run suites when their files change (dev mode)")
 	repeat := fs.Int("repeat", 1, "run all suites N times and report per-case stability (flake detection)")
+	jobs := fs.Int("j", 1, "run suites concurrently (1 = serial)")
 	junitPath := fs.String("junit", "", "write a JUnit XML report to this path")
 	htmlPath := fs.String("html", "", "write a single-file HTML report to this path")
 	if err := fs.Parse(reorderFlags(args)); err != nil {
@@ -66,13 +68,35 @@ func runTest(args []string, stdout, stderr io.Writer) int {
 		return 2
 	}
 
-	runOnce := func() int {
-		var reports []*runner.SuiteReport
-		for _, f := range files {
-			reports = append(reports, runner.RunSuiteFile(f, runner.Options{
-				UpdateSnapshots: *update,
-			}))
+	runSuites := func() []*runner.SuiteReport {
+		n := *jobs
+		if n < 1 || n > len(files) {
+			n = len(files)
 		}
+		if n <= 1 {
+			var reports []*runner.SuiteReport
+			for _, f := range files {
+				reports = append(reports, runner.RunSuiteFile(f, runner.Options{UpdateSnapshots: *update}))
+			}
+			return reports
+		}
+		reports := make([]*runner.SuiteReport, len(files))
+		sem := make(chan struct{}, n)
+		var wg sync.WaitGroup
+		for i, f := range files {
+			wg.Add(1)
+			go func(i int, f string) {
+				defer wg.Done()
+				sem <- struct{}{}
+				reports[i] = runner.RunSuiteFile(f, runner.Options{UpdateSnapshots: *update})
+				<-sem
+			}(i, f)
+		}
+		wg.Wait()
+		return reports
+	}
+	runOnce := func() int {
+		reports := runSuites()
 		report.RenderTerminal(stdout, reports, *verbose)
 
 		if *junitPath != "" {
@@ -108,12 +132,7 @@ func runTest(args []string, stdout, stderr io.Writer) int {
 	if *repeat > 1 {
 		st := newStability(*repeat)
 		for i := 0; i < *repeat; i++ {
-			var reports []*runner.SuiteReport
-			for _, f := range files {
-				reports = append(reports, runner.RunSuiteFile(f, runner.Options{
-					UpdateSnapshots: *update,
-				}))
-			}
+			reports := runSuites()
 			report.RenderTerminal(stdout, reports, *verbose)
 			st.record(reports)
 		}
@@ -140,7 +159,7 @@ func writeReport(path string, render func(*os.File) error) error {
 // (Go's flag package stops parsing at the first positional).
 func reorderFlags(args []string) []string {
 	valueFlags := map[string]bool{
-		"--junit": true, "--html": true, "--sarif": true, "--min-score": true, "--dir": true, "--badge": true, "--json": true, "--repeat": true,
+		"--junit": true, "--html": true, "--sarif": true, "--min-score": true, "--dir": true, "--badge": true, "--json": true, "--repeat": true, "-j": true, "--jobs": true,
 	}
 	var flags, positional []string
 	for i := 0; i < len(args); i++ {
