@@ -56,6 +56,9 @@ jobs:
       - name: Regenerate leaderboard
         run: go run ./cmd/verax leaderboard --dir docs/registry
 
+      - name: Generate ecosystem report
+        run: go run ./cmd/verax report --dir docs/registry
+
       - name: Smoke the badge service
         run: |
           go build -o /tmp/verax-badge ./apps/badge/cmd
