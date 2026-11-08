@@ -29,6 +29,28 @@ func bareEnvRef(content string, end int) bool {
 	return true
 }
 
+// envInheritanceContext: spreading/copying env into a child-process spawn
+// is the standard inheritance pattern, not consumer-facing exposure. The
+// spawn call and the env spread are often a few lines apart (options
+// object), so the previous few lines count as context.
+var envInheritanceRe = regexp.MustCompile(`\b(spawn|spawnSync|execFile|fork|exec)\s*\(`)
+
+func envInheritanceContext(content string, at int, snip string) bool {
+	if envInheritanceRe.MatchString(snip) {
+		return true
+	}
+	// look back up to 3 line starts for the spawn call
+	starts := 0
+	i := at
+	for i > 0 && starts < 3 {
+		if content[i-1] == '\n' {
+			starts++
+		}
+		i--
+	}
+	return envInheritanceRe.MatchString(content[i:at])
+}
+
 // secEnvDump (VX-SEC-001): exposing the whole environment — through tool
 // results, logs or spreads — leaks every secret the server can see.
 var secEnvDump = sourceRule{
@@ -45,6 +67,9 @@ var secEnvDump = sourceRule{
 			snip := snippetAt(content, loc[0])
 			if isCommentLine(snip) {
 				continue
+			}
+			if envInheritanceContext(content, loc[0], snip) {
+				continue // ...process.env into a child spawn: inheritance, not exposure
 			}
 			out = append(out, Finding{
 				RuleID: "VX-SEC-001", Title: "whole-environment exposure (bare process.env)",
@@ -63,6 +88,42 @@ var shellTrueRe = regexp.MustCompile(`shell\s*:\s*true`)
 // dynamicExecRe matches exec-family calls whose first argument does not
 // start with a quote (i.e. a built/interpolated command string).
 var dynamicExecRe = regexp.MustCompile(`\b(exec|execSync|spawn|spawnSync)\(\s*[^"'\s)]`)
+
+// spawnWithArgArray reports whether the match is a spawn/spawnSync call
+// whose second argument is an array literal (argv form — safe by design).
+func spawnWithArgArray(content string, loc []int) bool {
+	m := content[loc[0]:loc[1]]
+	if !strings.Contains(m, "spawn") {
+		return false
+	}
+	rest := content[loc[1]:]
+	if len(rest) > 60 {
+		rest = rest[:60]
+	}
+	rest = strings.TrimLeft(rest, " 	")
+	if strings.HasPrefix(rest, "(") { // second arg group started; skip first arg
+		rest = rest[1:]
+	}
+	// find the comma that ends the first argument at depth 0
+	depth := 0
+	for i := 0; i < len(rest); i++ {
+		switch rest[i] {
+		case '(', '[', '{':
+			depth++
+		case ')', ']', '}':
+			if depth == 0 {
+				return false
+			}
+			depth--
+		case ',':
+			if depth == 0 {
+				nxt := strings.TrimLeft(rest[i+1:], " \t\n")
+				return strings.HasPrefix(nxt, "[")
+			}
+		}
+	}
+	return false
+}
 
 // secShellExec (VX-SEC-003): shell command construction from data — string
 // building into exec-family calls or explicit shell:true — is the classic
@@ -91,6 +152,9 @@ var secShellExec = sourceRule{
 			})
 		}
 		for _, loc := range dynamicExecRe.FindAllStringIndex(content, -1) {
+			if spawnWithArgArray(content, loc) {
+				continue // argv-array spawn: the recommended safe form
+			}
 			flag(loc[0], "command string is constructed, not a literal — injection surface")
 		}
 		for _, loc := range shellTrueRe.FindAllStringIndex(content, -1) {
