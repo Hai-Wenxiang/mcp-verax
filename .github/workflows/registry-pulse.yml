@@ -25,7 +25,7 @@ jobs:
       - name: Run registry pulse (5 pages, 15 packages)
         run: |
           go run ./cmd/verax registry-pulse \
-            --pages 5 --sample 15 \
+            --pages 10 --sample 30 -j 6 \
             --out docs/registry \
             --http-timeout 60s
 

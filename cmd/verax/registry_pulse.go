@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Hai-Wenxiang/mcp-verax/internal/scanner"
@@ -49,6 +50,7 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 	sample := fs.Int("sample", 10, "max npm entries to scan")
 	outDir := fs.String("out", "docs/registry", "output directory for pulse reports")
 	registry := fs.String("registry", "https://registry.modelcontextprotocol.io", "registry base URL")
+	jobs := fs.Int("j", 4, "concurrent package scans")
 	timeout := fs.Duration("http-timeout", 30*time.Second, "registry HTTP timeout")
 	if err := fs.Parse(args); err != nil {
 		return 2
@@ -129,34 +131,45 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 		Findings []scanner.Finding `json:"findings,omitempty"`
 		Error    string            `json:"error,omitempty"`
 	}
-	var rows []row
-	for _, e := range npmEntries {
+	// concurrent scans, results kept in input order
+	rows := make([]row, len(npmEntries))
+	sem := make(chan struct{}, maxInt(1, *jobs))
+	var wg sync.WaitGroup
+	for i, e := range npmEntries {
 		pkg := e.Server.Packages[0]
 		spec := pkg.Identifier
 		if pkg.Version != "" {
 			spec += "@" + pkg.Version
 		}
-		r := row{Name: e.Server.Name, Package: spec}
-		root, cleanup, err := scanner.FetchNPMPackage(spec)
-		if err != nil {
-			r.Error = err.Error()
-			rows = append(rows, r)
-			fmt.Fprintf(stdout, "  %-40s FETCH-ERR %v\n", e.Server.Name, err)
-			continue
-		}
-		res, err := scanner.Scan(root, spec)
-		cleanup()
-		if err != nil {
-			r.Error = err.Error()
-			rows = append(rows, r)
-			continue
-		}
-		r.Score = res.Score()
-		r.Files = res.Files
-		r.Findings = res.Findings
-		rows = append(rows, r)
-		fmt.Fprintf(stdout, "  %-40s %3d/100 (%d findings, %d files)\n", e.Server.Name, r.Score, len(r.Findings), r.Files)
+		rows[i] = row{Name: e.Server.Name, Package: spec}
+		wg.Add(1)
+		go func(i int, name, spec string) {
+			defer wg.Done()
+			sem <- struct{}{}
+			defer func() { <-sem }()
+			r := rows[i]
+			root, cleanup, err := scanner.FetchNPMPackage(spec)
+			if err != nil {
+				r.Error = err.Error()
+				rows[i] = r
+				fmt.Fprintf(stdout, "  %-40s FETCH-ERR %v\n", name, err)
+				return
+			}
+			res, err := scanner.Scan(root, spec)
+			cleanup()
+			if err != nil {
+				r.Error = err.Error()
+				rows[i] = r
+				return
+			}
+			r.Score = res.Score()
+			r.Files = res.Files
+			r.Findings = res.Findings
+			rows[i] = r
+			fmt.Fprintf(stdout, "  %-40s %3d/100 (%d findings, %d files)\n", name, r.Score, len(r.Findings), r.Files)
+		}(i, e.Server.Name, spec)
 	}
+	wg.Wait()
 
 	// 4) write reports
 	if err := os.MkdirAll(*outDir, 0o755); err != nil {
@@ -197,6 +210,20 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 	}
 	fmt.Fprintf(stdout, "wrote %s and %s\n", jsonPath, mdPath)
 	return 0
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func maxInt(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
 
 func countNpm(entries []regEntry) int {

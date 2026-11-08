@@ -35,7 +35,9 @@
 | **Registry Intelligence v0 (`verax registry-pulse`)** | ✅ Done | live official registry pull → sample scans → JSON+MD; nightly workflow; first live pulse: 2 npm pkgs (88, 95); DI-default false-positive class found & fixed via live data |
 | badge service (`apps/badge`) | ✅ Done | static-host badge server off pulse-latest.json; live smoke 88/100 SVG; nightly workflow smokes it |
 | M4 leaderboard page (`apps/leaderboard`) | ✅ Done | pulses → static self-contained HTML, nightly regenerates; seeded with today's live pulse |
-| next: Pages hosting, full-registry sampling | ⬜ Next | |
+| Pages hosting (leaderboard live) | ✅ Done | hai-wenxiang.github.io/mcp-verax — seeded with 6-package pulse |
+| concurrent pulse scans (-j) | ✅ Done | 4 pages→6 pkgs in one run; nightly bumped to 10 pages/30 pkgs/-j 6 |
+| next: full-registry sampling, trend charts | ⬜ Next | |
 
 Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 
@@ -115,3 +117,7 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 
 - 2026-11-08 — **v0.7.0 released**: badge service + leaderboard — M4's
   registry→scan→badges/board loop closed on live data.
+
+- 2026-11-08 (final): leaderboard LIVE on Pages; pulse -j concurrent;
+  wider live sample surfaced a 0/100 package (ai.adeu/adeu — shell-built
+  URL opens + uncontained credential writes; see docs/registry).
