@@ -17,8 +17,15 @@ Verax is a toolkit built around one idea: an MCP server should be able to **prov
 
 ```bash
 # Linux/macOS/Windows binaries: https://github.com/Hai-Wenxiang/mcp-verax/releases
-verax test your-server.suite.yaml --html report.html
+verax test your-server.suite.yaml --html report.html   # suites: assertions, SLO, fuzz, SSRF probe
+verax test your-server.suite.yaml --repeat 10          # flake detection: per-case stability
+verax scan @scope/mcp-server --badge badge.svg         # score a published package (osv CVEs incl.)
 ```
+
+**Field evidence** (2026-11-08): scanning the *official* `@modelcontextprotocol/server-memory`
+found 6 dependency advisories (see [compat/FINDINGS.md](./compat/FINDINGS.md) F-4); the SSRF probe
+cleared official server-everything (17 tools, 0 outbound hits); five scaffold templates all
+self-scan 100/100 — the flywheel (template → suite-green → scan-clean) runs end to end in CI.
 
 **Components (M1 → M4):**
 
