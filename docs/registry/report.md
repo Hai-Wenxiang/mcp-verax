@@ -38,10 +38,10 @@ critical **7** · high **58** · medium **154** · low **17** · total **236**
 | `@aetherwealth/mcp@0.2.9` | 23 | 1/4 |
 | `@2kw/ai-mcp-server@8.0.3` | 61 | 0/3 |
 | `@achromat-ai/mcp-server@0.1.4` | 82 | 0/1 |
-| `@extremely-agency/mcp@0.1.1` | 88 | 0/0 |
 | `adtest-mcp@1.1.0` | 88 | 0/0 |
+| `@extremely-agency/mcp@0.1.1` | 88 | 0/0 |
 | `pretrip-mcp@1.0.1` | 95 | 0/0 |
-| `@aimentiontracker/mcp@0.1.3` | 96 | 0/0 |
+| `@agent-bev/mcp-server@0.2.6` | 96 | 0/0 |
 
 ## Trend (packages with ≥2 pulses)
 
