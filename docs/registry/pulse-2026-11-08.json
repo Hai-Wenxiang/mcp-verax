@@ -1,0 +1,69 @@
+{
+  "date": "2026-11-08",
+  "entries_pulled": 60,
+  "npm_packaged": 3,
+  "scanned": 2,
+  "rows": [
+    {
+      "name": "agency.extremely/agency",
+      "package": "@extremely-agency/mcp@0.1.1",
+      "score": 88,
+      "files": 3,
+      "findings": [
+        {
+          "RuleID": "VX-SEC-008",
+          "Title": "outbound request to non-literal URL without allowlist",
+          "Severity": "medium",
+          "File": "lib.js",
+          "Line": 51,
+          "Snippet": "const res = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(msg), signal: ms ? AbortSignal.timeout(ms) : undefined });",
+          "Why": "tool-controlled URLs can target internal services (SSRF) unless destinations are constrained"
+        },
+        {
+          "RuleID": "VX-SEC-001",
+          "Title": "env dependency-injection default (review outputs)",
+          "Severity": "medium",
+          "File": "lib.js",
+          "Line": 25,
+          "Snippet": "export function directoryFile(env = process.env, platform = process.platform, home = homedir()) {",
+          "Why": "process.env is the default argument — fine for testing, but verify the function never returns env contents to tool callers"
+        },
+        {
+          "RuleID": "VX-SEC-001",
+          "Title": "env dependency-injection default (review outputs)",
+          "Severity": "medium",
+          "File": "lib.js",
+          "Line": 33,
+          "Snippet": "export function agencies(env = process.env) {",
+          "Why": "process.env is the default argument — fine for testing, but verify the function never returns env contents to tool callers"
+        }
+      ]
+    },
+    {
+      "name": "agency.kesey/pretrip",
+      "package": "pretrip-mcp@1.0.1",
+      "score": 95,
+      "files": 2,
+      "findings": [
+        {
+          "RuleID": "VX-SEC-008",
+          "Title": "outbound request to non-literal URL without allowlist",
+          "Severity": "medium",
+          "File": "index.mjs",
+          "Line": 146,
+          "Snippet": "const res = await fetch(LIBRARY_URL);",
+          "Why": "tool-controlled URLs can target internal services (SSRF) unless destinations are constrained"
+        },
+        {
+          "RuleID": "VX-QUA-105",
+          "Title": "no repository link",
+          "Severity": "low",
+          "File": "package.json",
+          "Line": 0,
+          "Snippet": "",
+          "Why": "no source provenance to audit against"
+        }
+      ]
+    }
+  ]
+}

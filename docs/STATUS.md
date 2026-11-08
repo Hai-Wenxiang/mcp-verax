@@ -34,7 +34,8 @@
 | deps CVE (OSV) + per-advisory severity | ✅ Done | S10/S11, best-effort refinement |
 | **Registry Intelligence v0 (`verax registry-pulse`)** | ✅ Done | live official registry pull → sample scans → JSON+MD; nightly workflow; first live pulse: 2 npm pkgs (88, 95); DI-default false-positive class found & fixed via live data |
 | badge service (`apps/badge`) | ✅ Done | static-host badge server off pulse-latest.json; live smoke 88/100 SVG; nightly workflow smokes it |
-| M4 leaderboard page | ⬜ Next | |
+| M4 leaderboard page (`apps/leaderboard`) | ✅ Done | pulses → static self-contained HTML, nightly regenerates; seeded with today's live pulse |
+| next: Pages hosting, full-registry sampling | ⬜ Next | |
 
 Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 
@@ -108,3 +109,6 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 
 - 2026-11-08 — **v0.6.0 released**: Registry Intelligence v0 (live official
   registry pulse + nightly workflow); DI-default FP class fixed from live data.
+
+- 2026-11-08 (final hour): badge service + leaderboard page; M4's visible
+  loop (registry → scan → badges/leaderboard) complete end-to-end.
