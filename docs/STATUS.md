@@ -37,7 +37,9 @@
 | M4 leaderboard page (`apps/leaderboard`) | ✅ Done | pulses → static self-contained HTML, nightly regenerates; seeded with today's live pulse |
 | Pages hosting (leaderboard live) | ✅ Done | hai-wenxiang.github.io/mcp-verax — seeded with 6-package pulse |
 | concurrent pulse scans (-j) | ✅ Done | 4 pages→6 pkgs in one run; nightly bumped to 10 pages/30 pkgs/-j 6 |
-| next: full-registry sampling, trend charts | ⬜ Next | |
+| leaderboard trend lines | ✅ Done | per-package date:score series, oldest→newest, grows with nightly pulses |
+| pulse retry/backoff | ✅ Done | 3 attempts, linear backoff — live registry TLS flakiness hardened |
+| next: full-registry sampling | ⬜ Next | |
 
 Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 
