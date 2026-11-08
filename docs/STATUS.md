@@ -60,6 +60,8 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 - 2026-11-08 — S10–S13: osv.dev CVE enrichment, log-secret rule, verax rules
   catalog + handbook, --min-score gate, Streamable HTTP url-target suites.
 - 2026-11-08 — **v0.2.0 released**.
+- 2026-11-08 — `verax new` scaffolder (templates embedded), notes-store
+  template, VX-DYN-201 SSRF dynamic probe. **v0.3.0 released**.
 
 ## M3 kickoff: templates (2026-11-08 evening)
 
