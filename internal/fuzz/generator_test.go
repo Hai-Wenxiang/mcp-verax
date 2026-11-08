@@ -100,7 +100,9 @@ func TestDictionaryHostility(t *testing.T) {
 			t.Errorf("dictionary missing %q", want)
 		}
 	}
-	for _, banned := range []string{"http://", "https://", "sk-", "AKIA"} {
+	// policy: inert payloads — real-looking URLs and credential shapes banned;
+	// example.invalid/localhost-style documentation hosts are allowed
+	for _, banned := range []string{"https://", "http://example.com", "sk-", "AKIA", "ghp_"} {
 		if strings.Contains(joined, banned) {
 			t.Errorf("dictionary must stay inert, contains %q", banned)
 		}

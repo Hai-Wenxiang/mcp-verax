@@ -1,0 +1,14 @@
+# encoding / unicode / structural junk
+null-byte-\x00-inline
+emoji-\U0001F4A9-\U0001F9EA
+rtl-‮override
+ünïcödé-nôrmàlizàtiôn
+全角ｃｈａｒｓ＋中文
+{}
+[]
+{"a":1}
+line1\nline2\r\nline3
+tab\there
+%s%s%s%n
+javascript:alert(1)
+data:text/html;base64,PHNjcmlwdD4=

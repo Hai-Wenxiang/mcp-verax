@@ -1,11 +1,15 @@
 package fuzz
 
-import "math/rand"
+import (
+	"math/rand"
 
-// Dictionary entries are hostile string probes grouped by category. They are
-// deliberately inert payloads (no live URLs, no real credentials): their job
-// is to break sloppy parsers, not to exfiltrate anything.
-var Dictionary = []string{
+	"github.com/Hai-Wenxiang/mcp-verax/corpus"
+)
+
+// Dictionary combines the embedded community corpus (corpus/fuzz/*.txt —
+// PR-welcome) with legacy entries kept for fixture-count stability.
+// All payloads are inert by policy (corpus hygiene test enforces it).
+var Dictionary = append(corpus.FuzzPayloads(), []string{
 	// path traversal / filesystem
 	"../../etc/passwd",
 	"..\\..\\windows\\win.ini",
@@ -42,7 +46,7 @@ var Dictionary = []string{
 	"javascript:alert(1)",
 	"data:text/html;base64,PHNjcmlwdD4=",
 	veryLongString(1024),
-}
+}...)
 
 func veryLongString(n int) string {
 	b := make([]byte, n)

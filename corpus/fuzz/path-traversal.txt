@@ -1,0 +1,8 @@
+../../etc/passwd
+..\\..\\windows\\win.ini
+/dev/null
+C:\\
+./
+/var/run/docker.sock
+%2e%2e%2f%2e%2e%2fetc%2fpasswd
+....//....//etc/passwd
