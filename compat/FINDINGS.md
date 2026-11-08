@@ -2,7 +2,7 @@
 
 > **Run**: 2026-11-08, verax v0.1.0+, Windows 10 (node v24.19.0, npm 12), official npm packages.
 > **Suites**: `compat/*.suite.yaml` — runnable via `verax test compat/*.suite.yaml` from the repo root.
-> **Score**: everything 7/7 · memory 4/4 · sequential-thinking 4/4 · filesystem 4/4 (see F-2).
+> **Score**: everything 7/7 · memory 4/4 · sequential-thinking 4/4 · filesystem: catalogue/fuzz/leak only (see F-2).
 
 ## English
 
@@ -30,7 +30,7 @@ errors now carry the last server stderr lines (same commit).
 17 tools total. Suites targeting documented-but-renamed tools get a crisp
 `Tool add not found` (-32631). Tip: a deliberately-impossible
 `tools.list.includes` fails with a detail line listing the server's real
-catalogue (`compat/probe.suite.yaml` documents this probe trick).
+catalogue (`compat/probe.howto.yaml` documents this probe trick).
 
 ### F-2 (server-filesystem 2.2.0, Windows): rapid sequential calls hang
 
@@ -38,8 +38,11 @@ catalogue (`compat/probe.suite.yaml` documents this probe trick).
 - `read_file`: works in isolation/slow pacing, **hangs** when sent
   immediately after `tools/list`+`resources/list` responses.
 - With 1–3s spacing between identical requests: **all four respond**.
-- Path-traversal guard, handshake, fuzz (schema-driven hostile input), and
-  stdin-EOF shutdown all behave correctly.
+- The hang is **non-deterministic and spreading across request kinds**: later
+  runs tripped the path-escape probe and even a fuzz campaign that had passed
+  twice before — any rapid-fire call sequence is at risk on Windows.
+- Handshake, `tools/list`, and stdin-EOF shutdown behave correctly
+  throughout; compat suite therefore keeps catalogue+leak checks only.
 
 Reproducer (batch → hang, expect 3 responses and no 4th):
 
@@ -70,6 +73,6 @@ now with npm's stderr thanks to V-2). Quote the name:
 
 - **V-1（已修）**：discovery 假设三大原语齐全 —— 官方 filesystem/memory 本就没有 prompts 能力，-32601 不应炸掉整个用例。已改为按握手能力门控 + 容忍 method-not-found。
 - **V-2（已修）**：握手失败只报 "read: EOF"，服务器死因（崩溃/配置错/npx 404）全在 stderr 里看不到。现在错误信息携带服务器 stderr 尾部。
-- **F-1**：server-everything 2.2.1 工具改名（`add`→`get-sum` 等）；"不可能的 includes" 失败明细可直接 dump 真实工具清单（探针技巧见 probe.suite.yaml）。
+- **F-1**：server-everything 2.2.1 工具改名（`add`→`get-sum` 等）；"不可能的 includes" 失败明细可直接 dump 真实工具清单（探针技巧见 probe.howto.yaml）。
 - **F-2**：官方 filesystem 2.2.0 在 Windows 上：`list_directory` 无限挂起；`read_file` 紧跟 tools/list+resources/list 发送时挂起，间隔 1–3 秒重发则全部正常——疑似 stdio 传输对请求节奏敏感（服务器端问题，同模式打我们的 fixture 与 everything 均正常）。
 - **F-3**：npx 会把包名里 `-thinking` 当自己的旗标吃掉 → 404 秒退。包名加引号即可。
