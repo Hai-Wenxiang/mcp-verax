@@ -84,6 +84,15 @@ jobs:
         # same evidence-not-gate policy
         continue-on-error: true
 
+      - name: Scan this repo via the github target (must stay clean)
+        uses: ./
+        with:
+          mode: scan
+          target: gh:Hai-Wenxiang/mcp-verax@main
+        # self-scan through the full gh: pipeline (latest-release/default-
+        # branch resolve → codeload → pax-aware extract); verax must scan
+        # its own published archive clean — no gate flags, exit 0 required
+
       - name: Test the filesystem-safe template via composite action
         uses: ./
         with:

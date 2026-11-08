@@ -2,6 +2,14 @@
 
 All notable changes. Dates are 2026-11-08 (initial development day).
 
+## v0.14.0
+- `verax scan gh:owner/repo[@ref]`: scan any public GitHub repository —
+  ref defaults to the latest release tag (default branch as fallback);
+  codeload fetch, pax_global_header-aware archive-root stripping
+- Action self-test now scans verax's own published archive through the
+  full gh: pipeline and requires a clean exit
+- Published-artifact coverage: npm + crates.io + PyPI + GitHub
+
 ## v0.13.0
 - `verax scan pypi:name[@version]`: scan published PyPI sdists — JSON API
   version resolve, PEP 503 name normalization, tar.gz + zip extraction

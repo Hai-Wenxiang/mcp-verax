@@ -22,6 +22,7 @@ verax test your-server.suite.yaml --repeat 10          # flake detection: per-ca
 verax scan @scope/mcp-server --badge badge.svg         # score a published package (osv CVEs incl.)
 verax scan crate:rmcp --min-score 80                    # crates.io artifacts too
 verax scan pypi:mcp-server-fetch                        # and PyPI sdists
+verax scan gh:owner/mcp-server --min-score 80            # any public GitHub repo
 ```
 
 **Field evidence** (2026-11-08): scanning the *official* `@modelcontextprotocol/server-memory`
@@ -52,6 +53,7 @@ verax test tests/x.suite.yaml --repeat 10 -j 4                # 断言/探针/SL
 verax scan @scope/mcp-server --badge b.svg --min-score 90      # 规则+CVE 评分门禁 + 徽章
 verax scan crate:rmcp --min-score 80                    # crates.io 目标同样支持
 verax scan pypi:mcp-server-fetch                        # PyPI sdist 也可直接扫
+verax scan gh:owner/mcp-server --min-score 80            # 任意公开 GitHub 仓库
 verax new csv-query my-server                                 # 零依赖模板脚手架（套件绿、自扫满分）
 ```
 
