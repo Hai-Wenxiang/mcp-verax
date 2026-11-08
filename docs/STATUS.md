@@ -79,7 +79,8 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 | verax test -j N parallel suites | ✅ Done | bounded pool, order-stable reports; 4 suites live 27/27 | honeyport + string-arg injection; e2e on official everything (17 tools, 0 hits) |
 | rest-api-wrap template | ✅ Done | zero-dep OpenAPI subset + offline demo harness; suite 7/7 (path/body/404/allowlist) |
 | web-fetch-md template + result.not_contains | ✅ Done | fixed-port offline harness; scripts/styles leak check; suite 7/7, scan 100 |
-| next templates (db-readonly, …) | ⬜ Next | |
+| db-readonly template (JSONL tables) | ✅ Done | equals/contains filters, no SQL/eval; suite 8/8, scan 100 |
+| next templates | ⬜ Next | 6 shipped |
 
 ## M1 addendum: HTTP targets (2026-11-08 evening)
 

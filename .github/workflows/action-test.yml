@@ -80,6 +80,12 @@ jobs:
           mode: test
           files: templates/web-fetch-md/tests/server.suite.yaml
 
+      - name: Test the db-readonly template via composite action
+        uses: ./
+        with:
+          mode: test
+          files: templates/db-readonly/tests/server.suite.yaml
+
       - name: Scan a real published package via composite action
         uses: ./
         with:

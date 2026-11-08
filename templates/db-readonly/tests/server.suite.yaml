@@ -1,0 +1,51 @@
+# Embedded Verax suite for the db-readonly template.
+# Run from the repo root:  verax test templates/db-readonly/tests/server.suite.yaml
+suite: db-readonly-template
+target:
+  command: node templates/db-readonly/index.js
+  env:
+    VERAX_ROOT: templates/db-readonly/data
+  timeout_startup_ms: 30000
+case:
+  - name: tool catalogue
+    expect:
+      tools.list.includes: [list_tables, describe_table, query]
+      tools.list.schema_valid: true
+  - name: list finds the table
+    call: list_tables
+    expect:
+      ok: true
+      result.contains: ["users.jsonl"]
+  - name: describe reports columns
+    call: describe_table
+    args: {table: "users.jsonl"}
+    expect:
+      ok: true
+      result.contains: ["name", "role"]
+  - name: equals filter
+    call: query
+    args: {table: "users.jsonl", column: "role", equals: "dev"}
+    expect:
+      ok: true
+      result.contains: ["Grace", "Linus"]
+      result.not_contains: ["Ada"]
+  - name: contains filter
+    call: query
+    args: {table: "users.jsonl", column: "name", contains: "Ada"}
+    expect:
+      ok: true
+      result.contains: ["admin"]
+  - name: unknown column rejected
+    call: query
+    args: {table: "users.jsonl", column: "hax"}
+    expect:
+      is_error: true
+      error.contains: "unknown column"
+  - name: path escape rejected
+    call: describe_table
+    args: {table: "../../go.mod"}
+    expect:
+      is_error: true
+      error.contains: "escapes allowed root"
+leak:
+  process_exit: true

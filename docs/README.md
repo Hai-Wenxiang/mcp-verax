@@ -23,6 +23,7 @@
 | `notes-store` | notes CRUD | id charset, count/byte caps |
 | `rest-api-wrap` | OpenAPI → tools | ALLOWED_HOSTS lock, op cap, timeouts |
 | `web-fetch-md` | fetch pages as text | ALLOWED_HOSTS, size caps, script strip |
+| `db-readonly` | query JSONL tables | equals/contains only, caps |
 
 Every template ships zero npm dependencies, an embedded Verax suite
 (green in CI on every push) and scans 100/100.
