@@ -16,6 +16,7 @@ const maxScanBytes = 4 << 20 // 4 MiB
 var sourceExts = map[string]bool{
 	".js": true, ".cjs": true, ".mjs": true, ".ts": true, ".cts": true, ".mts": true,
 	".py": true,
+	".rs": true,
 }
 
 // ResolveTarget decides whether target is a local directory (with or without
@@ -63,7 +64,7 @@ func Scan(root string, target string) (*Result, error) {
 				return fs.SkipDir
 			}
 			return nil
-		case (name == "package.json" || name == "pyproject.toml" || name == "go.mod") && (pkgPath == "" || len(rel) < len(pkgPath)):
+		case (name == "package.json" || name == "pyproject.toml" || name == "go.mod" || name == "Cargo.toml") && (pkgPath == "" || len(rel) < len(pkgPath)):
 			pkgPath = rel
 		case sourceExts[strings.ToLower(filepath.Ext(name))]:
 			data, rerr := os.ReadFile(path)

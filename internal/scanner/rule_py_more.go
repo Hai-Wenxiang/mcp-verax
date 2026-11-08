@@ -10,13 +10,16 @@ func init() {
 	sourceRules = append(sourceRules, pyEvalExec, pyShellExec, pyUnsafeDeserialize, jsEmptyCatch, jsPIIScanners)
 }
 
-// langOf returns "py" for Python sources, "js" for JS/TS, "" otherwise.
+// langOf returns "py" for Python sources, "js" for JS/TS, "rs" for Rust,
+// "" otherwise.
 func langOf(rel string) string {
 	switch strings.ToLower(filepath.Ext(rel)) {
 	case ".py":
 		return "py"
 	case ".js", ".cjs", ".mjs", ".ts", ".cts", ".mts":
 		return "js"
+	case ".rs":
+		return "rs"
 	}
 	return ""
 }
