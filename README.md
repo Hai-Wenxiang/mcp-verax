@@ -25,8 +25,8 @@ verax test your-server.suite.yaml --html report.html
 | Component | What it does | Status |
 |---|---|---|
 | **Verax Test Kit** (`verax test`) | Declarative YAML test suites for MCP servers: handshake/primitive assertions, result snapshots, schema-driven fuzzing, latency SLOs, process-leak detection. Ships as a single Go binary. | ✅ v0.1.0 released |
-| **Verax Scanner** | Security / quality / privacy rule packs + dynamic probes → SARIF, 0–100 score, badges. | M2 |
-| **Verax Templates** | MCP server scaffolds with tests and secure defaults baked in (multi-language). | M3 |
+| **Verax Scanner** (`verax scan`) | 16 rules (js/py/pkg) + osv.dev CVEs → SARIF, 0–100 score, `--min-score` CI gate. | ✅ v0.2.0 |
+| **Verax Templates** | MCP server scaffolds with tests and secure defaults baked in. filesystem-safe + csv-query shipped. | 🚧 M3 |
 | **Verax Registry Intelligence** | Registry mirror + batch quality pipeline → leaderboard & quarterly ecosystem reports. | M4 |
 
 Design docs: [`docs/STATUS.md`](./docs/STATUS.md) (progress), [`docs/adr/`](./docs/adr/) (decisions), [`AGENTS.md`](./AGENTS.md) (contributing).
