@@ -22,10 +22,9 @@ var packageRules []packageRule
 var sourceRules []sourceRule
 
 func init() {
-	packageRules = []packageRule{
-		quaMetaMissing,
-	}
-	sourceRules = []sourceRule{}
+	// Rules register themselves from their own files via init() append, so
+	// this file never reassigns (and wipes) the registries.
+	packageRules = append(packageRules, quaMetaMissing)
 }
 
 // lineOf returns the 1-based line number of the i-th byte.
