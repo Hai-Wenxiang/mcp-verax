@@ -57,6 +57,9 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
   npm-artifact targets; real-package e2e on official servers.
 - 2026-11-08 — M2 S7–S9: privacy/outbound rules, Action scan mode, Python
   pack + language-aware dispatch — **16 rules**, all gates green.
+- 2026-11-08 — S10–S13: osv.dev CVE enrichment, log-secret rule, verax rules
+  catalog + handbook, --min-score gate, Streamable HTTP url-target suites.
+- 2026-11-08 — **v0.2.0 released**.
 
 ## M1 addendum: HTTP targets (2026-11-08 evening)
 
