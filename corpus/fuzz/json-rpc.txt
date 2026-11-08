@@ -1,0 +1,14 @@
+# malformed JSON-RPC / MCP protocol shapes (handshake & dispatch abuse)
+{"jsonrpc":"9.9","id":1,"method":"ping"}
+{"jsonrpc":"2.0","id":1.5,"method":"ping"}
+{"jsonrpc":"2.0","id":null,"method":"tools/list"}
+{"jsonrpc":"2.0","method":"notification/no-id"}
+{"jsonrpc":"2.0","id":1,"method":123}
+{"jsonrpc":"2.0","id":1,"method":"tools/call","params":"not-an-object"}
+{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":null}}
+{"jsonrpc":"2.0","id":[{"nested":"id"}],"method":"ping"}
+{"jsonrpc":"2.0","id":1,"method":"/../../etc/passwd"}
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"999.999.999"}}
+{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"x","arguments":{"_meta":{"progressToken":-1}}}}
+[]
+[{"jsonrpc":"2.0","id":1,"method":"ping"},{"jsonrpc":"2.0","id":2,"method":"ping"}]

@@ -17,6 +17,9 @@ payload per line, blank lines and `#` comments ignored.
 |---|---|
 | `path-traversal.txt` | filesystem escape attempts |
 | `shell-injection.txt` | shell/code injection surfaces |
+| `sql-injection.txt` | SQL injection classics |
 | `prompt-injection.txt` | instructions aimed at the model |
+| `json-rpc.txt` | malformed JSON-RPC / MCP protocol shapes |
+| `xss.txt` | HTML/script injection for content-rendering surfaces |
 | `encoding.txt` | unicode/control/structural junk |
 | `size.txt` | oversize and boundary strings |
