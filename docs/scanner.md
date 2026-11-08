@@ -20,18 +20,36 @@ verax scan @scope/mcp-server --sarif out.json  # SARIF 2.1.0 for GitHub Security
 
 Exit codes: `0` clean / low-only · `1` any critical or high · `2` usage.
 
-### Rule packs (v0)
+### Rule packs (16 rules, JS/TS + Python)
 
-| Rule | Severity | Detects |
-|---|---|---|
-| VX-SEC-001 | critical | whole-environment exposure (bare `process.env`, incl. spreads/stringify) |
-| VX-SEC-003 | high | shell commands built from non-literal input; `shell: true` |
-| VX-SEC-004 | high | `eval` / `new Function` surfaces |
-| VX-SEC-005 | high | credential-shaped literals (sk-/sk-ant-/ghp_/github_pat_/AKIA/xox*/AIza) |
-| VX-SEC-011 | high/medium | dependency typosquats (edit distance 1 / 2 of popular packages) |
-| VX-SEC-012 | medium | consumer-side install hooks (preinstall/install/postinstall) |
-| VX-QUA-105 | low/medium | package metadata completeness (missing manifest = medium) |
-| VX-QUA-106 | low | README presence |
+| Rule | Severity | Detects | Lang |
+|---|---|---|---|
+| VX-SEC-001 | critical | whole-environment exposure (bare `process.env`) | js |
+| VX-SEC-013 | critical | unsafe deserialization (`pickle`/`yaml.load`/`marshal`) | py |
+| VX-SEC-002 | high | filesystem writes to built paths, no containment markers | js |
+| VX-SEC-003 | high | shell from non-literal input / `shell:true` / `os.system` | js+py |
+| VX-SEC-004 | high | `eval`/`new Function` / `exec()` dynamic execution | js+py |
+| VX-SEC-005 | high | credential-shaped literals (7 shapes, masked in output) | any |
+| VX-SEC-011 | high/medium | dependency typosquats (edit distance 1/2 of popular pkgs) | pkg |
+| VX-SEC-012 | medium | consumer-side install hooks (preinstall/install/postinstall) | pkg |
+| VX-SEC-008 | medium | outbound requests to non-literal URLs without allowlist (SSRF) | js |
+| VX-PRV-301 | medium | embedded telemetry endpoints (segment/mixpanel/posthog/…) | any |
+| VX-PRV-302 | medium | hardcoded PII classifier patterns (email/phone/SSN regexes) | js |
+| VX-QUA-103 | low | empty catch blocks (swallowed errors) | js |
+| VX-QUA-105 | low/medium | package metadata completeness (missing manifest = medium) | pkg |
+| VX-QUA-106 | low | README presence | pkg |
+
+### Use in GitHub Actions
+
+```yaml
+- uses: Hai-Wenxiang/mcp-verax@main
+  with:
+    mode: scan
+    target: @scope/mcp-server        # or a local directory
+    sarif: verax.sarif
+```
+
+The action fails on critical/high findings and uploads the SARIF artifact.
 
 Scoring: 100 − Σ weights (critical 25 / high 10 / medium 4 / low 1), floored at 0.
 

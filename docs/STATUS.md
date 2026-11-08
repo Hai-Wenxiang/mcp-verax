@@ -28,7 +28,10 @@
 | S4 VX-SEC-012 install hooks + VX-SEC-011 typosquat | ✅ Done | edit distance 1(high)/2(medium) |
 | S5 npm pack targets (audit the published artifact) | ✅ Done | array+object npm JSON; escape-proof tar |
 | S6 SARIF 2.1.0 + `verax scan` CLI + e2e | ✅ Done | real scans: memory 96/100, everything 71/100 |
-| S7+ More rules (PRV pack, SEC-002/008), scan Action, badge | ⬜ Next | |
+| S7 Privacy/outbound rules (PRV-301, SEC-002, SEC-008) | ✅ Done | e2e found everything's url-elicitation surface |
+| S8 Action scan mode + self-test job | ✅ Done | mode: scan with sarif artifact upload |
+| S9 Language-aware rule dispatch + Python pack + JS QUA/PRV | ✅ Done | 16 rules total (js+py+pkg) |
+| S10+ Dynamic probes (VX-DYN), deps CVE (OSV), badge service | ⬜ Next | |
 
 Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 
@@ -52,3 +55,5 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
   (capability-gated discovery, handshake stderr), F-2/F-3 findings documented.
 - 2026-11-08 — **M2 Scanner core (S1–S6)**: engine + 8 rules + SARIF +
   npm-artifact targets; real-package e2e on official servers.
+- 2026-11-08 — M2 S7–S9: privacy/outbound rules, Action scan mode, Python
+  pack + language-aware dispatch — **16 rules**, all gates green.
