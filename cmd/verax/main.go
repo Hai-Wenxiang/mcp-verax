@@ -38,6 +38,8 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return runScan(args[1:], stdout, stderr)
 	case "rules":
 		return runRules(args[1:], stdout, stderr)
+	case "new":
+		return runNew(args[1:], stdout, stderr)
 	default:
 		fmt.Fprintf(stderr, "verax: unknown command %q\n\n", args[0])
 		usage(stderr)
@@ -111,14 +113,14 @@ func writeReport(path string, render func(*os.File) error) error {
 // (Go's flag package stops parsing at the first positional).
 func reorderFlags(args []string) []string {
 	valueFlags := map[string]bool{
-		"--junit": true, "--html": true, "--sarif": true, "--min-score": true,
+		"--junit": true, "--html": true, "--sarif": true, "--min-score": true, "--dir": true,
 	}
 	var flags, positional []string
 	for i := 0; i < len(args); i++ {
 		a := args[i]
 		isValueFlag := valueFlags[a]
 		isEqFlag := strings.HasPrefix(a, "--junit=") || strings.HasPrefix(a, "--html=") ||
-			strings.HasPrefix(a, "--sarif=") || strings.HasPrefix(a, "--min-score=")
+			strings.HasPrefix(a, "--sarif=") || strings.HasPrefix(a, "--min-score=") || strings.HasPrefix(a, "--dir=")
 		switch {
 		case isValueFlag:
 			if i+1 < len(args) {
