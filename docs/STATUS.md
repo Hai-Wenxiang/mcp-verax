@@ -73,7 +73,8 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 | `verax new` scaffolder | ✅ Done | templates embedded in binary; scaffold→cd→suite e2e green |
 | VX-DYN-201 SSRF probe (suite-level dynamic) | ✅ Done | honeyport + string-arg injection; e2e on official everything (17 tools, 0 hits) |
 | rest-api-wrap template | ✅ Done | zero-dep OpenAPI subset + offline demo harness; suite 7/7 (path/body/404/allowlist) |
-| next templates (db-readonly, web-fetch, …) | ⬜ Next | |
+| web-fetch-md template + result.not_contains | ✅ Done | fixed-port offline harness; scripts/styles leak check; suite 7/7, scan 100 |
+| next templates (db-readonly, …) | ⬜ Next | |
 
 ## M1 addendum: HTTP targets (2026-11-08 evening)
 

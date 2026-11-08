@@ -1,0 +1,44 @@
+# Embedded Verax suite for the web-fetch-md template (offline via demo.js,
+# which serves stub pages on the fixed port below).
+# Run from the repo root:  verax test templates/web-fetch-md/tests/server.suite.yaml
+suite: web-fetch-md-template
+target:
+  command: node templates/web-fetch-md/demo.js
+  timeout_startup_ms: 30000
+case:
+  - name: tool catalogue
+    expect:
+      tools.list.includes: [fetch_page]
+      tools.list.schema_valid: true
+  - name: html page becomes readable text
+    call: fetch_page
+    args: {url: "http://127.0.0.1:39871/docs"}
+    expect:
+      ok: true
+      result.contains: ["Verax Docs", "allowlisted hosts only"]
+  - name: scripts and styles never leak
+    call: fetch_page
+    args: {url: "http://127.0.0.1:39871/docs"}
+    expect:
+      ok: true
+      result.not_contains: ["alert(", "color:red", "<script"]
+  - name: plain text passes through
+    call: fetch_page
+    args: {url: "http://127.0.0.1:39871/plain"}
+    expect:
+      ok: true
+      result.contains: ["just plain text"]
+  - name: 404 surfaces cleanly
+    call: fetch_page
+    args: {url: "http://127.0.0.1:39871/nope"}
+    expect:
+      ok: true
+      result.contains: ["status 404"]
+  - name: non-listed host blocked
+    call: fetch_page
+    args: {url: "http://example.invalid/x"}
+    expect:
+      is_error: true
+      error.contains: "host not allowed"
+leak:
+  process_exit: true

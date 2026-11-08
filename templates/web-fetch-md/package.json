@@ -1,0 +1,19 @@
+{
+  "name": "web-fetch-md-template",
+  "version": "0.1.0",
+  "description": "Verax template: fetch allowlisted pages as readable text, zero dependencies.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hai-Wenxiang/mcp-verax"
+  },
+  "type": "module",
+  "bin": { "web-fetch-md": "./index.js" },
+  "verax-template": {
+    "id": "web-fetch-md",
+    "variables": [
+      { "name": "ALLOWED_HOSTS", "desc": "comma-separated allowed hosts", "default": "" },
+      { "name": "VERAX_MAX_BYTES", "desc": "response size cap", "default": "524288" }
+    ]
+  }
+}

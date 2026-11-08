@@ -70,11 +70,12 @@ type ExpectBlock struct {
 	PromptsListIncludes []string `yaml:"prompts.list.includes"`
 
 	// Result assertions (with call).
-	OK             bool     `yaml:"ok"`
-	IsError        bool     `yaml:"is_error"`
-	ErrorContains  string   `yaml:"error.contains"`
-	ResultContains []string `yaml:"result.contains"`
-	ResultSnapshot string   `yaml:"result.snapshot"`
+	OK                bool     `yaml:"ok"`
+	IsError           bool     `yaml:"is_error"`
+	ErrorContains     string   `yaml:"error.contains"`
+	ResultContains    []string `yaml:"result.contains"`
+	ResultNotContains []string `yaml:"result.not_contains"`
+	ResultSnapshot    string   `yaml:"result.snapshot"`
 }
 
 // SLO are latency/stability budgets measured against repeated tool calls.
@@ -211,7 +212,7 @@ func (e ExpectBlock) isEmptyExpect() bool {
 		e.ToolsListCount == 0 && !e.ToolsListSchemaOK &&
 		e.ResourcesListMin == 0 && len(e.PromptsListIncludes) == 0 &&
 		!e.OK && !e.IsError && e.ErrorContains == "" &&
-		len(e.ResultContains) == 0 && e.ResultSnapshot == ""
+		len(e.ResultContains) == 0 && len(e.ResultNotContains) == 0 && e.ResultSnapshot == ""
 }
 
 func (e ExpectBlock) hasDiscoveryKeys() bool {
@@ -222,7 +223,7 @@ func (e ExpectBlock) hasDiscoveryKeys() bool {
 
 func (e ExpectBlock) hasResultKeys() bool {
 	return e.OK || e.IsError || e.ErrorContains != "" ||
-		len(e.ResultContains) > 0 || e.ResultSnapshot != ""
+		len(e.ResultContains) > 0 || len(e.ResultNotContains) > 0 || e.ResultSnapshot != ""
 }
 
 func joinProblems(ps []string) error {

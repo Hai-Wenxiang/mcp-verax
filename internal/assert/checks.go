@@ -165,6 +165,24 @@ func EvaluateCall(expect dsl.ExpectBlock, got CallOutcome) []CheckResult {
 		})
 	}
 
+	if len(expect.ResultNotContains) > 0 {
+		text := ""
+		if got.Result != nil {
+			text = got.Text()
+		}
+		var leaked []string
+		for _, banned := range expect.ResultNotContains {
+			if strings.Contains(text, banned) {
+				leaked = append(leaked, banned)
+			}
+		}
+		out = append(out, CheckResult{
+			Desc:   "result.not_contains",
+			Pass:   len(leaked) == 0 && got.Result != nil,
+			Detail: fmt.Sprintf("forbidden substrings present: %v in %q", leaked, truncate(text, 200)),
+		})
+	}
+
 	if len(expect.ResultContains) > 0 {
 		text := ""
 		if got.Result != nil {

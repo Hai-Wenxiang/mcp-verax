@@ -73,3 +73,9 @@ jobs:
         with:
           mode: test
           files: templates/rest-api-wrap/tests/server.suite.yaml
+
+      - name: Test the web-fetch-md template via composite action
+        uses: ./
+        with:
+          mode: test
+          files: templates/web-fetch-md/tests/server.suite.yaml

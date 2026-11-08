@@ -195,3 +195,27 @@ func TestSplitQuoted(t *testing.T) {
 		}
 	}
 }
+
+func TestNotContainsParsesAndValidates(t *testing.T) {
+	good := `
+suite: nc
+target: {command: "x y"}
+case:
+  - name: a
+    call: t
+    expect:
+      result.not_contains: ["secret"]
+`
+	s, err := Parse([]byte(good), "nc.yaml")
+	if err != nil {
+		t.Fatalf("parse: %v", err)
+	}
+	if len(s.Cases[0].Expect.ResultNotContains) != 1 {
+		t.Errorf("not_contains not parsed")
+	}
+
+	bad := strings.Replace(good, "call: t\n", "", 1)
+	if _, err := Parse([]byte(bad), "nc-bad.yaml"); err == nil {
+		t.Error("result assertions without call must fail")
+	}
+}
