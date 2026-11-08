@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/Hai-Wenxiang/mcp-verax/internal/report"
 	"github.com/Hai-Wenxiang/mcp-verax/internal/runner"
@@ -44,13 +46,15 @@ func runTest(args []string, stdout, stderr io.Writer) int {
 	fs.SetOutput(stderr)
 	update := fs.Bool("u", false, "accept changed/new snapshots (goldens rewritten)")
 	verbose := fs.Bool("v", false, "show passing checks too")
-	if err := fs.Parse(args); err != nil {
+	junitPath := fs.String("junit", "", "write a JUnit XML report to this path")
+	htmlPath := fs.String("html", "", "write a single-file HTML report to this path")
+	if err := fs.Parse(reorderFlags(args)); err != nil {
 		return 2
 	}
 	files := fs.Args()
 	if len(files) == 0 {
 		fmt.Fprintln(stderr, "verax test: at least one suite file is required")
-		fmt.Fprintln(stderr, "usage: verax test [-u] [-v] <suite.yaml> [...]")
+		fmt.Fprintln(stderr, "usage: verax test [-u] [-v] [--junit path.xml] [--html path.html] <suite.yaml> [...]")
 		return 2
 	}
 
@@ -62,12 +66,68 @@ func runTest(args []string, stdout, stderr io.Writer) int {
 	}
 	report.RenderTerminal(stdout, reports, *verbose)
 
+	if *junitPath != "" {
+		if err := writeReport(*junitPath, func(f *os.File) error {
+			return report.RenderJUnit(f, reports, time.Now())
+		}); err != nil {
+			fmt.Fprintf(stderr, "verax test: junit report: %v\n", err)
+			return 1
+		}
+		fmt.Fprintf(stdout, "junit report: %s\n", *junitPath)
+	}
+	if *htmlPath != "" {
+		if err := writeReport(*htmlPath, func(f *os.File) error {
+			return report.RenderHTML(f, reports, time.Now())
+		}); err != nil {
+			fmt.Fprintf(stderr, "verax test: html report: %v\n", err)
+			return 1
+		}
+		fmt.Fprintf(stdout, "html report: %s\n", *htmlPath)
+	}
+
 	for _, r := range reports {
 		if !r.Pass() {
 			return 1
 		}
 	}
 	return 0
+}
+
+func writeReport(path string, render func(*os.File) error) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	return render(f)
+}
+
+// reorderFlags moves flags before positional files so that
+// `verax test suite.yaml --junit out.xml` works like flag-idiom users expect
+// (Go's flag package stops parsing at the first positional).
+var boolFlags = map[string]bool{"-u": true, "-v": true, "--u": true, "--v": true, "-u=true": true, "-v=true": true}
+
+func reorderFlags(args []string) []string {
+	var flags, positional []string
+	for i := 0; i < len(args); i++ {
+		a := args[i]
+		switch {
+		case a == "--junit" || a == "--html":
+			if i+1 < len(args) {
+				flags = append(flags, a, args[i+1])
+				i++
+			} else {
+				flags = append(flags, a)
+			}
+		case strings.HasPrefix(a, "--junit=") || strings.HasPrefix(a, "--html="):
+			flags = append(flags, a)
+		case strings.HasPrefix(a, "-"):
+			flags = append(flags, a)
+		default:
+			positional = append(positional, a)
+		}
+	}
+	return append(flags, positional...)
 }
 
 func usage(w io.Writer) {
