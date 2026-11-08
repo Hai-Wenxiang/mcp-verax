@@ -47,6 +47,8 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return runRegistryPulse(args[1:], stdout, stderr)
 	case "leaderboard":
 		return runLeaderboardCmd(args[1:], stdout, stderr)
+	case "report":
+		return runReportCmd(args[1:], stdout, stderr)
 	default:
 		fmt.Fprintf(stderr, "verax: unknown command %q\n\n", args[0])
 		usage(stderr)
@@ -208,6 +210,9 @@ Commands:
   new        Scaffold a server from a template
                verax new <template> <name> [--dir base]
   rules      List scanner rules
+  registry-pulse  Pull the official registry and scan a sample of its npm packages
+  leaderboard     Regenerate the leaderboard page from pulse data
+  report     Aggregate pulse data into an ecosystem report (md + html)
   version    Print the verax version
   help       Show this help
 
