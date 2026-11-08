@@ -128,6 +128,9 @@ func RunSuite(s *dsl.Suite, opts Options) *SuiteReport {
 			}
 		}
 		runSLOIfConfigured(s, &spawnOnce{grace: opts.CloseGraceMS}, report)
+		if s.Fuzz != nil && s.Fuzz.Runs > 0 {
+			runFuzzBlock(s, opts, report)
+		}
 		if leakCheck {
 			report.Cases = append(report.Cases, leakCaseResult(servers, leaks))
 		}
@@ -154,6 +157,10 @@ func RunSuite(s *dsl.Suite, opts Options) *SuiteReport {
 			Status: statusFromChecks(res.Checks()),
 			Checks: res.Checks(),
 		})
+	}
+	if s.Fuzz != nil && s.Fuzz.Runs > 0 {
+		fres, err := runFuzzCampaign(shared, *s.Fuzz)
+		report.Cases = append(report.Cases, fuzzCaseResult(fres, err))
 	}
 	_ = shared.Close()
 	if leakCheck {
