@@ -1,0 +1,335 @@
+{
+  "date": "2026-11-08",
+  "entries_pulled": 120,
+  "npm_packaged": 13,
+  "scanned": 6,
+  "rows": [
+    {
+      "name": "agency.extremely/agency",
+      "package": "@extremely-agency/mcp@0.1.1",
+      "score": 88,
+      "files": 3,
+      "findings": [
+        {
+          "RuleID": "VX-SEC-008",
+          "Title": "outbound request to non-literal URL without allowlist",
+          "Severity": "medium",
+          "File": "lib.js",
+          "Line": 51,
+          "Snippet": "const res = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(msg), signal: ms ? AbortSignal.timeout(ms) : undefined });",
+          "Why": "tool-controlled URLs can target internal services (SSRF) unless destinations are constrained"
+        },
+        {
+          "RuleID": "VX-SEC-001",
+          "Title": "env dependency-injection default (review outputs)",
+          "Severity": "medium",
+          "File": "lib.js",
+          "Line": 25,
+          "Snippet": "export function directoryFile(env = process.env, platform = process.platform, home = homedir()) {",
+          "Why": "process.env is the default argument — fine for testing, but verify the function never returns env contents to tool callers"
+        },
+        {
+          "RuleID": "VX-SEC-001",
+          "Title": "env dependency-injection default (review outputs)",
+          "Severity": "medium",
+          "File": "lib.js",
+          "Line": 33,
+          "Snippet": "export function agencies(env = process.env) {",
+          "Why": "process.env is the default argument — fine for testing, but verify the function never returns env contents to tool callers"
+        }
+      ]
+    },
+    {
+      "name": "agency.kesey/pretrip",
+      "package": "pretrip-mcp@1.0.1",
+      "score": 95,
+      "files": 2,
+      "findings": [
+        {
+          "RuleID": "VX-SEC-008",
+          "Title": "outbound request to non-literal URL without allowlist",
+          "Severity": "medium",
+          "File": "index.mjs",
+          "Line": 146,
+          "Snippet": "const res = await fetch(LIBRARY_URL);",
+          "Why": "tool-controlled URLs can target internal services (SSRF) unless destinations are constrained"
+        },
+        {
+          "RuleID": "VX-QUA-105",
+          "Title": "no repository link",
+          "Severity": "low",
+          "File": "package.json",
+          "Line": 0,
+          "Snippet": "",
+          "Why": "no source provenance to audit against"
+        }
+      ]
+    },
+    {
+      "name": "ai.2kw/mcp-server",
+      "package": "@2kw/ai-mcp-server@8.0.3",
+      "score": 61,
+      "files": 75,
+      "findings": [
+        {
+          "RuleID": "VX-SEC-001",
+          "Title": "env dependency-injection default (review outputs)",
+          "Severity": "medium",
+          "File": "dist/lib/agent-run.js",
+          "Line": 8,
+          "Snippet": "export function chatUrlFor(baseUrl, env = process.env) {",
+          "Why": "process.env is the default argument — fine for testing, but verify the function never returns env contents to tool callers"
+        },
+        {
+          "RuleID": "VX-SEC-003",
+          "Title": "shell command built from non-literal input",
+          "Severity": "high",
+          "File": "dist/lib/agent-run.js",
+          "Line": 61,
+          "Snippet": "const withVersion = /^agent\\/(.+)@(\\d+)$/.exec(ref);",
+          "Why": "command string is constructed, not a literal — injection surface"
+        },
+        {
+          "RuleID": "VX-SEC-003",
+          "Title": "shell command built from non-literal input",
+          "Severity": "high",
+          "File": "dist/lib/agent-run.js",
+          "Line": 64,
+          "Snippet": "const bare = /^agent\\/(.+)$/.exec(ref);",
+          "Why": "command string is constructed, not a literal — injection surface"
+        },
+        {
+          "RuleID": "VX-SEC-008",
+          "Title": "outbound request to non-literal URL without allowlist",
+          "Severity": "medium",
+          "File": "dist/tools/docs.js",
+          "Line": 9,
+          "Snippet": "const res = await fetch(specUrl, {",
+          "Why": "tool-controlled URLs can target internal services (SSRF) unless destinations are constrained"
+        },
+        {
+          "RuleID": "VX-SEC-002",
+          "Title": "filesystem write to non-literal path",
+          "Severity": "high",
+          "File": "dist/tools/files.js",
+          "Line": 125,
+          "Snippet": "await writeFile(savePath, buffer);",
+          "Why": "no containment check in this file — a crafted path can escape the workspace"
+        },
+        {
+          "RuleID": "VX-QUA-105",
+          "Title": "no repository link",
+          "Severity": "low",
+          "File": "package.json",
+          "Line": 0,
+          "Snippet": "",
+          "Why": "no source provenance to audit against"
+        }
+      ]
+    },
+    {
+      "name": "ai.achromat/mcp-server",
+      "package": "@achromat-ai/mcp-server@0.1.4",
+      "score": 82,
+      "files": 9,
+      "findings": [
+        {
+          "RuleID": "VX-SEC-001",
+          "Title": "env dependency-injection default (review outputs)",
+          "Severity": "medium",
+          "File": "dist/config.js",
+          "Line": 31,
+          "Snippet": "export function loadConfig(env = process.env, home = homedir()) {",
+          "Why": "process.env is the default argument — fine for testing, but verify the function never returns env contents to tool callers"
+        },
+        {
+          "RuleID": "VX-SEC-008",
+          "Title": "outbound request to non-literal URL without allowlist",
+          "Severity": "medium",
+          "File": "dist/format.js",
+          "Line": 74,
+          "Snippet": "return result(true, [`The service refused the request (HTTP 401${code ? `, ${code}` : \"\"}).`, ...(message ? [message] : [])]);",
+          "Why": "tool-controlled URLs can target internal services (SSRF) unless destinations are constrained"
+        },
+        {
+          "RuleID": "VX-SEC-002",
+          "Title": "filesystem write to non-literal path",
+          "Severity": "high",
+          "File": "dist/registration.js",
+          "Line": 237,
+          "Snippet": "writeFileSync(tmp, pem, { flag: \"wx\", mode: 0o600 });",
+          "Why": "no containment check in this file — a crafted path can escape the workspace"
+        }
+      ]
+    },
+    {
+      "name": "ai.adeu/adeu",
+      "package": "@adeu/mcp-server@1.7.1",
+      "score": 0,
+      "files": 13,
+      "findings": [
+        {
+          "RuleID": "VX-QUA-103",
+          "Title": "empty catch block (swallowed error)",
+          "Severity": "low",
+          "File": "dist/index.js",
+          "Line": 343,
+          "Snippet": "} catch {",
+          "Why": "failures vanish silently — tools report success while broken"
+        },
+        {
+          "RuleID": "VX-SEC-003",
+          "Title": "shell command built from non-literal input",
+          "Severity": "high",
+          "File": "dist/index.js",
+          "Line": 185,
+          "Snippet": "if (platform() === \"darwin\") exec(`open \"${url}\"`);",
+          "Why": "command string is constructed, not a literal — injection surface"
+        },
+        {
+          "RuleID": "VX-SEC-003",
+          "Title": "shell command built from non-literal input",
+          "Severity": "high",
+          "File": "dist/index.js",
+          "Line": 186,
+          "Snippet": "else if (platform() === \"win32\") exec(`start \"\" \"${url}\"`);",
+          "Why": "command string is constructed, not a literal — injection surface"
+        },
+        {
+          "RuleID": "VX-SEC-003",
+          "Title": "shell command built from non-literal input",
+          "Severity": "high",
+          "File": "dist/index.js",
+          "Line": 187,
+          "Snippet": "else exec(`xdg-open \"${url}\"`);",
+          "Why": "command string is constructed, not a literal — injection surface"
+        },
+        {
+          "RuleID": "VX-SEC-003",
+          "Title": "shell command built from non-literal input",
+          "Severity": "high",
+          "File": "dist/index.js",
+          "Line": 379,
+          "Snippet": "const match = pattern.exec(text);",
+          "Why": "command string is constructed, not a literal — injection surface"
+        },
+        {
+          "RuleID": "VX-SEC-002",
+          "Title": "filesystem write to non-literal path",
+          "Severity": "high",
+          "File": "src/desktop-auth.ts",
+          "Line": 40,
+          "Snippet": "writeFileSync(CRED_PATH, JSON.stringify({ api_key: apiKey }));",
+          "Why": "no containment check in this file — a crafted path can escape the workspace"
+        },
+        {
+          "RuleID": "VX-SEC-003",
+          "Title": "shell command built from non-literal input",
+          "Severity": "high",
+          "File": "src/desktop-auth.ts",
+          "Line": 20,
+          "Snippet": "if (platform() === \"darwin\") exec(`open \"${url}\"`);",
+          "Why": "command string is constructed, not a literal — injection surface"
+        },
+        {
+          "RuleID": "VX-SEC-003",
+          "Title": "shell command built from non-literal input",
+          "Severity": "high",
+          "File": "src/desktop-auth.ts",
+          "Line": 21,
+          "Snippet": "else if (platform() === \"win32\") exec(`start \"\" \"${url}\"`);",
+          "Why": "command string is constructed, not a literal — injection surface"
+        },
+        {
+          "RuleID": "VX-SEC-003",
+          "Title": "shell command built from non-literal input",
+          "Severity": "high",
+          "File": "src/desktop-auth.ts",
+          "Line": 22,
+          "Snippet": "else exec(`xdg-open \"${url}\"`);",
+          "Why": "command string is constructed, not a literal — injection surface"
+        },
+        {
+          "RuleID": "VX-SEC-002",
+          "Title": "filesystem write to non-literal path",
+          "Severity": "high",
+          "File": "src/index.ts",
+          "Line": 367,
+          "Snippet": "fs.writeFileSync(outPath, outBuf);",
+          "Why": "no containment check in this file — a crafted path can escape the workspace"
+        },
+        {
+          "RuleID": "VX-SEC-002",
+          "Title": "filesystem write to non-literal path",
+          "Severity": "high",
+          "File": "src/index.ts",
+          "Line": 399,
+          "Snippet": "fs.writeFileSync(outPath, outBuf);",
+          "Why": "no containment check in this file — a crafted path can escape the workspace"
+        },
+        {
+          "RuleID": "VX-SEC-002",
+          "Title": "filesystem write to non-literal path",
+          "Severity": "high",
+          "File": "src/index.ts",
+          "Line": 457,
+          "Snippet": "fs.writeFileSync(outPath, result.outBuffer!);",
+          "Why": "no containment check in this file — a crafted path can escape the workspace"
+        },
+        {
+          "RuleID": "VX-SEC-003",
+          "Title": "shell command built from non-literal input",
+          "Severity": "high",
+          "File": "src/tools/email.ts",
+          "Line": 75,
+          "Snippet": "const match = pattern.exec(text);",
+          "Why": "command string is constructed, not a literal — injection surface"
+        },
+        {
+          "RuleID": "VX-QUA-105",
+          "Title": "no description",
+          "Severity": "low",
+          "File": "package.json",
+          "Line": 0,
+          "Snippet": "",
+          "Why": "listing gives users no signal about intent"
+        }
+      ]
+    },
+    {
+      "name": "ai.adtest/adtest-mcp",
+      "package": "adtest-mcp@1.1.0",
+      "score": 88,
+      "files": 2,
+      "findings": [
+        {
+          "RuleID": "VX-SEC-008",
+          "Title": "outbound request to non-literal URL without allowlist",
+          "Severity": "medium",
+          "File": "index.js",
+          "Line": 86,
+          "Snippet": "resp = await fetch(submitEndpoint, { method: \"POST\", headers: { \"x-api-key\": API_KEY }, body: form });",
+          "Why": "tool-controlled URLs can target internal services (SSRF) unless destinations are constrained"
+        },
+        {
+          "RuleID": "VX-SEC-008",
+          "Title": "outbound request to non-literal URL without allowlist",
+          "Severity": "medium",
+          "File": "index.js",
+          "Line": 88,
+          "Snippet": "resp = await fetch(submitEndpoint, {",
+          "Why": "tool-controlled URLs can target internal services (SSRF) unless destinations are constrained"
+        },
+        {
+          "RuleID": "VX-SEC-008",
+          "Title": "outbound request to non-literal URL without allowlist",
+          "Severity": "medium",
+          "File": "index.js",
+          "Line": 115,
+          "Snippet": "pr = await fetch(pollUrl, { headers: { \"x-api-key\": API_KEY } });",
+          "Why": "tool-controlled URLs can target internal services (SSRF) unless destinations are constrained"
+        }
+      ]
+    }
+  ]
+}
