@@ -61,6 +61,13 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
   catalog + handbook, --min-score gate, Streamable HTTP url-target suites.
 - 2026-11-08 — **v0.2.0 released**.
 
+## M3 kickoff: templates (2026-11-08 evening)
+
+| Feature | Status | Notes |
+|---|---|---|
+| filesystem-safe template (first of the library) | ✅ Done | zero-dep Node, root containment; suite 5/5, self-scan 100/100 |
+| next templates (rest-api-wrap, db-readonly, …) | ⬜ Next | |
+
 ## M1 addendum: HTTP targets (2026-11-08 evening)
 
 | Feature | Status | Notes |

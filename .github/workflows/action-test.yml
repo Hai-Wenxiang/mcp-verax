@@ -49,3 +49,9 @@ jobs:
           mode: scan
           target: testfixtures/scanclean
           sarif: verax.sarif
+
+      - name: Test the filesystem-safe template via composite action
+        uses: ./
+        with:
+          mode: test
+          files: templates/filesystem-safe/tests/server.suite.yaml

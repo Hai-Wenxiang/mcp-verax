@@ -1,0 +1,33 @@
+# Embedded Verax suite for the filesystem-safe template.
+# Run from the repo root:  verax test templates/filesystem-safe/tests/server.suite.yaml
+# (after copying the template into your project, adjust the command/VERAX_ROOT)
+suite: filesystem-safe-template
+target:
+  command: node templates/filesystem-safe/index.js
+  env:
+    VERAX_ROOT: templates/filesystem-safe/data
+  timeout_startup_ms: 20000
+case:
+  - name: tool catalogue
+    expect:
+      tools.list.includes: [list_files, read_file, write_file]
+      tools.list.schema_valid: true
+  - name: write then read round trip
+    call: write_file
+    args: {path: "hello.txt", content: "template round trip"}
+    expect:
+      ok: true
+  - name: read back what we wrote
+    call: read_file
+    args: {path: "hello.txt"}
+    expect:
+      ok: true
+      result.contains: ["template round trip"]
+  - name: path escape rejected (security default)
+    call: read_file
+    args: {path: "../../escape.txt"}
+    expect:
+      is_error: true
+      error.contains: "escapes allowed root"
+leak:
+  process_exit: true

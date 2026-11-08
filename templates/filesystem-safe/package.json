@@ -1,0 +1,18 @@
+{
+  "name": "filesystem-safe-template",
+  "version": "0.1.0",
+  "description": "Verax template: MCP filesystem server with root-containment security defaults.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hai-Wenxiang/mcp-verax"
+  },
+  "type": "module",
+  "bin": { "filesystem-safe": "./index.js" },
+  "verax-template": {
+    "id": "filesystem-safe",
+    "variables": [
+      { "name": "VERAX_ROOT", "desc": "allowed root directory", "default": "./data" }
+    ]
+  }
+}
