@@ -52,6 +52,7 @@ func runTest(args []string, stdout, stderr io.Writer) int {
 	fs.SetOutput(stderr)
 	update := fs.Bool("u", false, "accept changed/new snapshots (goldens rewritten)")
 	verbose := fs.Bool("v", false, "show passing checks too")
+	watch := fs.Bool("watch", false, "re-run suites when their files change (dev mode)")
 	junitPath := fs.String("junit", "", "write a JUnit XML report to this path")
 	htmlPath := fs.String("html", "", "write a single-file HTML report to this path")
 	if err := fs.Parse(reorderFlags(args)); err != nil {
@@ -60,43 +61,50 @@ func runTest(args []string, stdout, stderr io.Writer) int {
 	files := fs.Args()
 	if len(files) == 0 {
 		fmt.Fprintln(stderr, "verax test: at least one suite file is required")
-		fmt.Fprintln(stderr, "usage: verax test [-u] [-v] [--junit path.xml] [--html path.html] <suite.yaml> [...]")
+		fmt.Fprintln(stderr, "usage: verax test [-u] [-v] [--watch] [--junit path.xml] [--html path.html] <suite.yaml> [...]")
 		return 2
 	}
 
-	var reports []*runner.SuiteReport
-	for _, f := range files {
-		reports = append(reports, runner.RunSuiteFile(f, runner.Options{
-			UpdateSnapshots: *update,
-		}))
-	}
-	report.RenderTerminal(stdout, reports, *verbose)
+	runOnce := func() int {
+		var reports []*runner.SuiteReport
+		for _, f := range files {
+			reports = append(reports, runner.RunSuiteFile(f, runner.Options{
+				UpdateSnapshots: *update,
+			}))
+		}
+		report.RenderTerminal(stdout, reports, *verbose)
 
-	if *junitPath != "" {
-		if err := writeReport(*junitPath, func(f *os.File) error {
-			return report.RenderJUnit(f, reports, time.Now())
-		}); err != nil {
-			fmt.Fprintf(stderr, "verax test: junit report: %v\n", err)
-			return 1
+		if *junitPath != "" {
+			if err := writeReport(*junitPath, func(f *os.File) error {
+				return report.RenderJUnit(f, reports, time.Now())
+			}); err != nil {
+				fmt.Fprintf(stderr, "verax test: junit report: %v\n", err)
+				return 1
+			}
+			fmt.Fprintf(stdout, "junit report: %s\n", *junitPath)
 		}
-		fmt.Fprintf(stdout, "junit report: %s\n", *junitPath)
-	}
-	if *htmlPath != "" {
-		if err := writeReport(*htmlPath, func(f *os.File) error {
-			return report.RenderHTML(f, reports, time.Now())
-		}); err != nil {
-			fmt.Fprintf(stderr, "verax test: html report: %v\n", err)
-			return 1
+		if *htmlPath != "" {
+			if err := writeReport(*htmlPath, func(f *os.File) error {
+				return report.RenderHTML(f, reports, time.Now())
+			}); err != nil {
+				fmt.Fprintf(stderr, "verax test: html report: %v\n", err)
+				return 1
+			}
+			fmt.Fprintf(stdout, "html report: %s\n", *htmlPath)
 		}
-		fmt.Fprintf(stdout, "html report: %s\n", *htmlPath)
+
+		for _, r := range reports {
+			if !r.Pass() {
+				return 1
+			}
+		}
+		return 0
 	}
 
-	for _, r := range reports {
-		if !r.Pass() {
-			return 1
-		}
+	if *watch {
+		return watchLoop(files, runOnce, stdout)
 	}
-	return 0
+	return runOnce()
 }
 
 func writeReport(path string, render func(*os.File) error) error {
