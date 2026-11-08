@@ -8,6 +8,7 @@ package runner
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -271,6 +272,9 @@ func runCase(cli *mcpclient.Client, c dsl.Case, store *assert.SnapshotStore, opt
 	}
 
 	callRes, err := cli.CallTool(ctx, c.Call, c.Args)
+	if err != nil && errors.Is(err, context.DeadlineExceeded) {
+		err = fmt.Errorf("timed out after %dms (tool may hang)", callBudget)
+	}
 	outcome := assert.CallOutcome{Result: callRes, Err: err}
 	res.Checks = assert.EvaluateCall(c.Expect, outcome)
 	if c.Expect.ResultSnapshot != "" && callRes != nil {
