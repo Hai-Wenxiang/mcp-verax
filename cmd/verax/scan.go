@@ -17,6 +17,7 @@ func runScan(args []string, stdout, stderr io.Writer) int {
 	sarifPath := fs.String("sarif", "", "write a SARIF 2.1.0 report to this path")
 	noOSV := fs.Bool("no-osv", false, "skip dependency CVE enrichment (osv.dev)")
 	minScore := fs.Int("min-score", 0, "exit 1 when the score drops below this threshold (0-100)")
+	badgePath := fs.String("badge", "", "write a shields-style SVG score badge to this path")
 	if err := fs.Parse(reorderFlags(args)); err != nil {
 		return 2
 	}
@@ -61,6 +62,21 @@ func runScan(args []string, stdout, stderr io.Writer) int {
 	}
 
 	scanner.RenderTerminal(stdout, res)
+
+	if *badgePath != "" {
+		bf, berr := os.Create(*badgePath)
+		if berr != nil {
+			fmt.Fprintf(stderr, "verax scan: badge: %v\n", berr)
+			return 1
+		}
+		if berr := scanner.RenderBadge(bf, res); berr != nil {
+			bf.Close()
+			fmt.Fprintf(stderr, "verax scan: badge: %v\n", berr)
+			return 1
+		}
+		bf.Close()
+		fmt.Fprintf(stdout, "badge: %s\n", *badgePath)
+	}
 
 	if *sarifPath != "" {
 		f, ferr := os.Create(*sarifPath)
