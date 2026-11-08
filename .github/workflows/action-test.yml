@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 jobs:
-  use-action:
+  use-action-test:
     strategy:
       fail-fast: false
       matrix:
@@ -25,6 +25,7 @@ jobs:
       - name: Run verax via composite action
         uses: ./
         with:
+          mode: test
           files: examples/mcp-fixture.suite.yaml
           verbose: 'true'
           junit: verax-junit.xml
@@ -36,3 +37,15 @@ jobs:
           name: verax-reports-${{ matrix.os }}
           path: verax-junit.xml
           if-no-files-found: ignore
+
+  use-action-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan the clean fixture via composite action
+        uses: ./
+        with:
+          mode: scan
+          target: testfixtures/scanclean
+          sarif: verax.sarif

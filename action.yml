@@ -1,19 +1,29 @@
-name: 'Verax MCP Test'
+name: 'Verax MCP Test & Scan'
 description: >
-  Run Verax test suites (YAML) against MCP servers. Discovers *.suite.yaml
-  failures, snapshots, SLO/leak/fuzz blocks. Until the first binary release
-  ships, the action builds the verax CLI from this repository with Go.
+  Run Verax test suites (YAML) against MCP servers, or statically scan an
+  MCP server package (local dir or npm spec) for security/quality/privacy
+  findings with SARIF output. Builds the verax CLI from this repository
+  with Go until the first binary release ships.
 
 branding:
   icon: 'check-circle'
   color: 'green'
 
 inputs:
+  mode:
+    description: 'test | scan'
+    required: false
+    default: 'test'
   files:
-    description: 'Suite file(s) or glob, space-separated (e.g. "tests/*.suite.yaml")'
-    required: true
+    description: '[test] Suite file(s) or glob, space-separated'
+    required: false
+    default: ''
+  target:
+    description: '[scan] Local directory or npm package spec (@scope/pkg)'
+    required: false
+    default: ''
   update-snapshots:
-    description: 'Accept changed/new snapshots (-u)'
+    description: '[test] Accept changed/new snapshots (-u)'
     required: false
     default: 'false'
   verbose:
@@ -21,11 +31,15 @@ inputs:
     required: false
     default: 'false'
   junit:
-    description: 'Write JUnit XML report to this path'
+    description: '[test] Write JUnit XML report to this path'
     required: false
     default: ''
   html:
-    description: 'Write single-file HTML report to this path'
+    description: '[test] Write single-file HTML report to this path'
+    required: false
+    default: ''
+  sarif:
+    description: '[scan] Write SARIF 2.1.0 report to this path'
     required: false
     default: ''
 
@@ -44,7 +58,8 @@ runs:
         go build -o "$RUNNER_TEMP/verax-bin/verax${{ runner.os == 'Windows' && '.exe' || '' }}" ./cmd/verax
       working-directory: ${{ github.action_path }}
 
-    - name: Run suites
+    - name: Run test suites
+      if: inputs.mode == 'test'
       shell: bash
       run: |
         set -euo pipefail
@@ -54,3 +69,20 @@ runs:
         if [ -n "${{ inputs.junit }}" ]; then ARGS+=("--junit" "${{ inputs.junit }}"); fi
         if [ -n "${{ inputs.html }}" ]; then ARGS+=("--html" "${{ inputs.html }}"); fi
         "$RUNNER_TEMP/verax-bin/verax${{ runner.os == 'Windows' && '.exe' || '' }}" test "${ARGS[@]}" ${{ inputs.files }}
+
+    - name: Scan package
+      if: inputs.mode == 'scan'
+      shell: bash
+      run: |
+        set -euo pipefail
+        ARGS=()
+        if [ -n "${{ inputs.sarif }}" ]; then ARGS+=("--sarif" "${{ inputs.sarif }}"); fi
+        "$RUNNER_TEMP/verax-bin/verax${{ runner.os == 'Windows' && '.exe' || '' }}" scan "${ARGS[@]}" "${{ inputs.target }}"
+
+    - name: Upload SARIF artifact
+      if: inputs.mode == 'scan' && inputs.sarif != ''
+      uses: actions/upload-artifact@v4
+      with:
+        name: verax-sarif
+        path: ${{ inputs.sarif }}
+        if-no-files-found: error
