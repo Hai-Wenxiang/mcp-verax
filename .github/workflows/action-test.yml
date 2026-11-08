@@ -50,6 +50,23 @@ jobs:
           target: testfixtures/scanclean
           sarif: verax.sarif
 
+      - name: Scan the Rust fixture via composite action
+        uses: ./
+        with:
+          mode: scan
+          target: testfixtures/scanrust
+          sarif: rust.sarif
+        # fixture findings are the point (Rust rule pack e2e): scan exits 1
+        # on any finding by default, and this fixture is built to have them
+        continue-on-error: true
+
+      - name: Rust rules actually fired
+        run: |
+          grep -q "VX-SEC-014" rust.sarif
+          grep -q "VX-QUA-107" rust.sarif
+          grep -q "VX-SEC-003" rust.sarif
+          echo "rust rule pack verified in SARIF"
+
       - name: Test the filesystem-safe template via composite action
         uses: ./
         with:
