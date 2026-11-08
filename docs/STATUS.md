@@ -33,7 +33,8 @@
 | S9 Language-aware rule dispatch + Python pack + JS QUA/PRV | ✅ Done | 16 rules total (js+py+pkg) |
 | deps CVE (OSV) + per-advisory severity | ✅ Done | S10/S11, best-effort refinement |
 | **Registry Intelligence v0 (`verax registry-pulse`)** | ✅ Done | live official registry pull → sample scans → JSON+MD; nightly workflow; first live pulse: 2 npm pkgs (88, 95); DI-default false-positive class found & fixed via live data |
-| badge service (Worker), M4 leaderboard | ⬜ Next | |
+| badge service (`apps/badge`) | ✅ Done | static-host badge server off pulse-latest.json; live smoke 88/100 SVG; nightly workflow smokes it |
+| M4 leaderboard page | ⬜ Next | |
 
 Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 
