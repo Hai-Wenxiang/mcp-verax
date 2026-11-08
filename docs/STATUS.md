@@ -104,3 +104,6 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 - `verax` CLI: test (8 flags) / scan (6 flags) / init / new / rules
 - 45/45 suite cases green in parallel (-j 7); self-scan 100/100
 - Field evidence F-1..F-4 against official reference servers
+
+- 2026-11-08 — **v0.6.0 released**: Registry Intelligence v0 (live official
+  registry pulse + nightly workflow); DI-default FP class fixed from live data.

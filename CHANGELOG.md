@@ -2,6 +2,12 @@
 
 All notable changes. Dates are 2026-11-08 (initial development day).
 
+## v0.6.0
+- `verax registry-pulse`: official MCP registry pull → sample scans → dated
+  JSON+MD reports; nightly workflow commits pulses to docs/registry/
+- First live pulse (60 entries, 2 npm packages) fixed a real rule FP:
+  `env = process.env` DI defaults now medium review items, not critical
+
 ## v0.5.0
 - `probe.side_effect`: dynamic honeypot-diff probe (write-while-read-only)
 - `verax test -j N`: suites in parallel
