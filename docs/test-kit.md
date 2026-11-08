@@ -168,7 +168,13 @@ fixture (hit reported as `fetch_url.url`).
 
 ## 中文
 
-`verax test` 用声明式 YAML 套件对真实 MCP server（stdio 拉起）做回归测试：断言/快照/延迟 SLO/进程泄漏/Schema 模糊测试一应俱全，终端 + JUnit XML + 单文件 HTML 三种报告，`--junit/--html` 落盘，GitHub Action 三行接入 CI。
+`verax test` 用声明式 YAML 套件对真实 MCP server（stdio 或 Streamable HTTP 目标）做回归测试：
+
+- 断言（含 `result.not_contains` 反包含）、黄金快照（`-u` 接受变更）
+- 延迟 SLO（p95/并发/成功率，纳秒计时）、进程泄漏检测（stdin-EOF + 进程树击杀）
+- Schema 驱动模糊测试（种子确定性）、**SSRF 动态探针**（蜜罐端口注入）、**副作用探针**（蜜罐目录 diff）
+- 终端 / JUnit XML / 单文件 HTML 三种报告；`--watch` 开发模式；`--repeat N` 稳定性与 flake 检测；`-j N` 并行
+- GitHub Action：`mode: test` 三行接入 CI
 
 ### 快速开始
 
