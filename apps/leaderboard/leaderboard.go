@@ -80,6 +80,23 @@ func Render(pulses []*Pulse) string {
 <main>
 `)
 
+	// trend data: package -> [(date, score)]; pulses are date-desc, so
+	// reverse each series to render oldest → newest
+	trend := map[string][][2]interface{}{}
+	for _, p := range pulses {
+		for _, r := range p.Rows {
+			if r.Error == "" {
+				trend[r.Package] = append(trend[r.Package], [2]interface{}{p.Date, r.Score})
+			}
+		}
+	}
+	for pkg, pts := range trend {
+		for i, j := 0, len(pts)-1; i < j; i, j = i+1, j-1 {
+			pts[i], pts[j] = pts[j], pts[i]
+		}
+		trend[pkg] = pts
+	}
+
 	for _, p := range pulses {
 		rows := append([]struct {
 			Name     string      `json:"name"`
@@ -110,8 +127,20 @@ func Render(pulses []*Pulse) string {
 				}
 				scoreHTML = fmt.Sprintf(`<span class="score %s">%d</span>`, cls, r.Score)
 			}
-			fmt.Fprintf(&b, "<tr><td>%d</td><td>%s</td><td><code>%s</code></td><td>%s</td></tr>\n",
-				i+1, r.Name, r.Package, scoreHTML)
+			trendHTML := ""
+			if pts := trend[r.Package]; len(pts) > 1 {
+				parts := make([]string, len(pts))
+				for k, pt := range pts {
+					d, _ := pt[0].(string)
+					if len(d) > 5 {
+						d = d[5:] // "2026-11-08" → "11-08"
+					}
+					parts[k] = fmt.Sprintf("%s:%v", d, pt[1])
+				}
+				trendHTML = fmt.Sprintf(`<br><span class="trend">%s</span>`, strings.Join(parts, " → "))
+			}
+			fmt.Fprintf(&b, "<tr><td>%d</td><td>%s</td><td><code>%s</code>%s</td><td>%s</td></tr>\n",
+				i+1, r.Name, r.Package, trendHTML, scoreHTML)
 		}
 		b.WriteString("</table>\n</section>\n")
 	}

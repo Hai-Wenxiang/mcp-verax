@@ -63,3 +63,41 @@ func TestGenerateDir(t *testing.T) {
 		t.Errorf("pulse duplicated: %d", strings.Count(string(raw), "2026-11-08 —"))
 	}
 }
+
+func TestRenderTrendAcrossDates(t *testing.T) {
+	rowA := func(score int) struct {
+		Name     string      `json:"name"`
+		Package  string      `json:"package"`
+		Score    int         `json:"score"`
+		Findings interface{} `json:"findings"`
+		Error    string      `json:"error"`
+	} {
+		return struct {
+			Name     string      `json:"name"`
+			Package  string      `json:"package"`
+			Score    int         `json:"score"`
+			Findings interface{} `json:"findings"`
+			Error    string      `json:"error"`
+		}{Name: "a", Package: "a@1.0.0", Score: score}
+	}
+	pulses := []*Pulse{
+		{Date: "2026-11-01", Rows: []struct {
+			Name     string      `json:"name"`
+			Package  string      `json:"package"`
+			Score    int         `json:"score"`
+			Findings interface{} `json:"findings"`
+			Error    string      `json:"error"`
+		}{rowA(70)}},
+		{Date: "2026-11-08", Rows: []struct {
+			Name     string      `json:"name"`
+			Package  string      `json:"package"`
+			Score    int         `json:"score"`
+			Findings interface{} `json:"findings"`
+			Error    string      `json:"error"`
+		}{rowA(88)}},
+	}
+	html := Render(pulses)
+	if !strings.Contains(html, "11-01:70 → 11-08:88") {
+		t.Errorf("trend line missing:\n%s", html)
+	}
+}
