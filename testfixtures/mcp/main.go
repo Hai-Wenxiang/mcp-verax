@@ -170,6 +170,14 @@ func main() {
 		}
 	}
 	_ = initialized
+
+	// stdin closed. A well-behaved MCP server exits here; the leak switch
+	// simulates servers that hang around (process-leak detection target).
+	if os.Getenv("MCP_IGNORE_EOF") == "1" {
+		for {
+			time.Sleep(time.Hour)
+		}
+	}
 }
 
 func respond(w *bufio.Writer, id json.RawMessage, result any) {

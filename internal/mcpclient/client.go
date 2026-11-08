@@ -236,3 +236,7 @@ func (c *Client) Close() error {
 
 // Stderr exposes the server's captured stderr lines.
 func (c *Client) Stderr() []string { return c.tr.Stderr() }
+
+// CleanExit reports whether the server process exited by itself after stdin
+// close (valid after Close; false also before Close).
+func (c *Client) CleanExit() bool { return c.tr.CleanExit() }

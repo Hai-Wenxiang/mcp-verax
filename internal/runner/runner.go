@@ -34,6 +34,8 @@ type Options struct {
 	Lookup dsl.LookupFunc
 	// DefaultCallMS bounds a call without explicit timeout_ms (default 60000).
 	DefaultCallMS int
+	// CloseGraceMS bounds stdin-EOF-to-kill during leak checks (default 3000).
+	CloseGraceMS int
 }
 
 func (o Options) lookup() dsl.LookupFunc {
@@ -103,10 +105,14 @@ func RunSuite(s *dsl.Suite, opts Options) *SuiteReport {
 	report.SnapshotFile = store.Path()
 	defer func() { _ = store.Save() }()
 
+	leakCheck := s.Leak != nil && s.Leak.ProcessExit
+
 	if anyCaseEnv(s) {
 		// Respawn mode: fresh server per case (per-case env isolation).
+		leaks := 0
+		servers := 0
 		for _, c := range s.Cases {
-			cli, err := spawn(s, c.Env)
+			cli, err := spawnGrace(s, c.Env, opts.CloseGraceMS)
 			if err != nil {
 				report.Cases = append(report.Cases, CaseResult{
 					Name: c.Name, Status: StatusError, Err: "start server: " + err.Error(),
@@ -115,18 +121,24 @@ func RunSuite(s *dsl.Suite, opts Options) *SuiteReport {
 			}
 			report.Cases = append(report.Cases, runCase(cli, c, store, opts))
 			_ = cli.Close()
+			servers++
+			if !cli.CleanExit() {
+				leaks++
+			}
 		}
-		runSLOIfConfigured(s, &spawnOnce{}, report)
+		runSLOIfConfigured(s, &spawnOnce{grace: opts.CloseGraceMS}, report)
+		if leakCheck {
+			report.Cases = append(report.Cases, leakCaseResult(servers, leaks))
+		}
 		return report
 	}
 
 	// Shared mode: one server for the whole suite.
-	shared, err := spawn(s, nil)
+	shared, err := spawnGrace(s, nil, opts.CloseGraceMS)
 	if err != nil {
 		report.Cases = []CaseResult{{Name: "(suite)", Status: StatusError, Err: "start server: " + err.Error()}}
 		return report
 	}
-	defer shared.Close()
 	for _, c := range s.Cases {
 		res := runCase(shared, c, store, opts)
 		if res.Status != StatusPass && len(shared.Stderr()) > 0 {
@@ -142,20 +154,46 @@ func RunSuite(s *dsl.Suite, opts Options) *SuiteReport {
 			Checks: res.Checks(),
 		})
 	}
+	_ = shared.Close()
+	if leakCheck {
+		leaks := 0
+		if !shared.CleanExit() {
+			leaks = 1
+		}
+		report.Cases = append(report.Cases, leakCaseResult(1, leaks))
+	}
 	return report
+}
+
+// leakCaseResult builds the summary case for process-exit leak checks.
+func leakCaseResult(servers, leaks int) CaseResult {
+	desc := fmt.Sprintf("%d/%d server processes exited on stdin close within grace", servers-leaks, servers)
+	check := assert.CheckResult{
+		Desc: desc,
+		Pass: leaks == 0,
+	}
+	if leaks > 0 {
+		check.Detail = fmt.Sprintf("%d process(es) leaked (did not exit after stdin EOF); force-killed", leaks)
+	}
+	return CaseResult{
+		Name:   "leak(process_exit)",
+		Status: statusFromChecks([]assert.CheckResult{check}),
+		Checks: []assert.CheckResult{check},
+	}
 }
 
 // spawnOnce abstracts "give me a client for SLO" in respawn mode.
 type spawnOnce struct {
-	cli *mcpclient.Client
-	err error
+	cli   *mcpclient.Client
+	err   error
+	grace int
 }
 
 func (so *spawnOnce) get(s *dsl.Suite) (*mcpclient.Client, error) {
 	if so.cli != nil || so.err != nil {
 		return so.cli, so.err
 	}
-	so.cli, so.err = spawn(s, nil)
+	so.cli, so.err = spawnGrace(s, nil, so.grace)
 	return so.cli, so.err
 }
 
@@ -179,7 +217,7 @@ func runSLOIfConfigured(s *dsl.Suite, so *spawnOnce, report *SuiteReport) {
 	})
 }
 
-func spawn(s *dsl.Suite, extraEnv map[string]string) (*mcpclient.Client, error) {
+func spawnGrace(s *dsl.Suite, extraEnv map[string]string, closeGrace int) (*mcpclient.Client, error) {
 	parts, err := s.Target.CommandParts()
 	if err != nil {
 		return nil, err
@@ -201,9 +239,10 @@ func spawn(s *dsl.Suite, extraEnv map[string]string) (*mcpclient.Client, error) 
 		timeout = time.Duration(s.Target.StartupTimeoutMS) * time.Millisecond
 	}
 	return mcpclient.Connect(context.Background(), mcpclient.StdioConfig{
-		Command: parts[0],
-		Args:    parts[1:],
-		Env:     envList,
+		Command:      parts[0],
+		Args:         parts[1:],
+		Env:          envList,
+		CloseGraceMS: closeGrace,
 	}, mcpclient.Options{HandshakeTimeout: timeout})
 }
 

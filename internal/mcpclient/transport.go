@@ -20,6 +20,10 @@ type StdioConfig struct {
 	Args    []string
 	Env     []string // extra env vars (merged over os.Environ); VERAX_* reserved
 	Dir     string   // working directory ("" = inherit)
+	// CloseGraceMS bounds the wait between stdin EOF and forceful tree kill
+	// during Close (default 3000). A well-behaved MCP server exits on stdin
+	// EOF; exceeding the grace is reported as a process leak.
+	CloseGraceMS int
 }
 
 // StdioTransport is a line-delimited JSON-RPC pipe to a child process.
@@ -34,12 +38,14 @@ type StdioTransport struct {
 	enc    *jsonrpc.Encoder
 	dec    *jsonrpc.Decoder
 
-	mu       sync.Mutex
-	closed   bool
-	stderrCh chan string
-	stderr   []string
-	waitErr  error
-	waitDone chan struct{}
+	mu           sync.Mutex
+	closed       bool
+	cleanExit    bool
+	closeGraceMS int
+	stderrCh     chan string
+	stderr       []string
+	waitErr      error
+	waitDone     chan struct{}
 }
 
 // StartStdio spawns the server process and wires up its stdio.
@@ -49,6 +55,7 @@ func StartStdio(ctx context.Context, cfg StdioConfig) (*StdioTransport, error) {
 		cmd.Env = append(cmd.Environ(), cfg.Env...)
 	}
 	cmd.Dir = cfg.Dir
+	setSysProcAttr(cmd)
 
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
@@ -64,13 +71,14 @@ func StartStdio(ctx context.Context, cfg StdioConfig) (*StdioTransport, error) {
 	}
 
 	t := &StdioTransport{
-		cmd:      cmd,
-		stdin:    stdin,
-		stdout:   stdout,
-		enc:      jsonrpc.NewEncoder(stdin),
-		dec:      jsonrpc.NewDecoder(stdout),
-		stderrCh: make(chan string, 64),
-		waitDone: make(chan struct{}),
+		cmd:          cmd,
+		stdin:        stdin,
+		stdout:       stdout,
+		enc:          jsonrpc.NewEncoder(stdin),
+		dec:          jsonrpc.NewDecoder(stdout),
+		closeGraceMS: cfg.CloseGraceMS,
+		stderrCh:     make(chan string, 64),
+		waitDone:     make(chan struct{}),
 	}
 
 	if err := cmd.Start(); err != nil {
@@ -140,8 +148,10 @@ func (t *StdioTransport) Stderr() []string {
 	return out
 }
 
-// Close shuts stdin (an MCP-friendly graceful signal), waits briefly for the
-// process to exit, then kills it. Always safe to call twice.
+// Close shuts stdin (an MCP-friendly graceful signal), waits for the grace
+// period, then kills the whole process tree. Always safe to call twice.
+// CleanExit reports (after Close) whether the server exited on stdin EOF
+// within the grace period — false means a process leak.
 func (t *StdioTransport) Close() error {
 	t.mu.Lock()
 	if t.closed {
@@ -149,23 +159,37 @@ func (t *StdioTransport) Close() error {
 		return nil
 	}
 	t.closed = true
+	grace := t.closeGrace()
 	t.mu.Unlock()
 
 	t.stdin.Close()
 	select {
 	case <-t.waitDone:
-	case <-time.After(3 * time.Second):
-		if err := t.cmd.Process.Kill(); err != nil {
-			return fmt.Errorf("mcpclient: kill after grace: %w", err)
+		t.mu.Lock()
+		t.cleanExit = true
+		t.mu.Unlock()
+	case <-time.After(grace):
+		if err := killTree(t.cmd.Process.Pid); err != nil {
+			return fmt.Errorf("mcpclient: kill tree after grace: %w", err)
 		}
 		<-t.waitDone
 	}
-	if t.waitErr != nil && t.waitErr.Error() != "wait: no child processes" {
-		// Non-zero exit is surfaced, but Close itself is not an error for
-		// servers that exit non-zero; the runner decides severity.
-		_ = t.waitErr
-	}
 	return nil
+}
+
+// CleanExit reports whether Close() observed the server exiting by itself
+// within the grace period (valid only after Close).
+func (t *StdioTransport) CleanExit() bool {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	return t.cleanExit
+}
+
+func (t *StdioTransport) closeGrace() time.Duration {
+	if t.closeGraceMS > 0 {
+		return time.Duration(t.closeGraceMS) * time.Millisecond
+	}
+	return 3 * time.Second
 }
 
 // ExitErr returns the process wait error (nil if clean exit 0), only valid
