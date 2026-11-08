@@ -1,19 +1,29 @@
 name: registry-pulse
 
-# Registry Intelligence v0: nightly pull of the official MCP registry,
-# scan a sample of npm-packaged entries, commit the pulse report.
+# Registry Intelligence: nightly sample pulse + weekly full-registry walk
+# (Monday 05:33 Beijing). After each pulse the leaderboard (index.html) and
+# pulse-latest.json (badge data) are regenerated, everything is committed,
+# and the Pages deploy is triggered — the visible loop closes itself.
 
 on:
   schedule:
-    - cron: '17 20 * * *'   # 04:17 Beijing, daily
+    - cron: '17 20 * * *'   # 04:17 Beijing, daily — sample: 10 pages / 30 pkgs
+    - cron: '33 21 * * 1'   # 05:33 Beijing, Monday — full-registry walk
   workflow_dispatch:
+    inputs:
+      full-walk:
+        description: 'Full-registry walk instead of the nightly sample'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
+  actions: write   # trigger the pages deploy after committing a pulse
 
 jobs:
   pulse:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
@@ -22,12 +32,48 @@ jobs:
           go-version: stable
           cache: false
 
-      - name: Run registry pulse (5 pages, 15 packages)
+      - name: Pick pulse arguments
+        id: args
         run: |
-          go run ./cmd/verax registry-pulse \
-            --pages 10 --sample 30 -j 6 \
-            --out docs/registry \
-            --http-timeout 60s
+          FULL=false
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" = "33 21 * * 1" ]; then
+            FULL=true
+          fi
+          if [ "${{ inputs.full-walk }}" = "true" ]; then
+            FULL=true
+          fi
+          if [ "$FULL" = "true" ]; then
+            echo "args=--all --max-pages 100 --sample 150 -j 6 --http-timeout 60s" >> "$GITHUB_OUTPUT"
+          else
+            echo "args=--pages 10 --sample 30 -j 6 --http-timeout 60s" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run registry pulse
+        run: |
+          go run ./cmd/verax registry-pulse ${{ steps.args.outputs.args }} \
+            --out docs/registry
+
+      - name: Regenerate leaderboard
+        run: go run ./cmd/verax leaderboard --dir docs/registry
+
+      - name: Smoke the badge service
+        run: |
+          go build -o /tmp/verax-badge ./apps/badge/cmd
+          /tmp/verax-badge -pulse docs/registry/pulse-latest.json -addr 127.0.0.1:8080 &
+          BPID=$!
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:8080/healthz >/dev/null && break
+            sleep 1
+          done
+          SPEC=$(jq -r '[.rows[] | select(.error == null or .error == "")][0].package' docs/registry/pulse-latest.json)
+          if [ -z "$SPEC" ] || [ "$SPEC" = "null" ]; then
+            echo "no scannable package in pulse-latest.json — badge data broken"
+            kill $BPID 2>/dev/null || true
+            exit 1
+          fi
+          ENC=$(printf '%s' "$SPEC" | jq -sRr @uri)
+          curl -sf "http://127.0.0.1:8080/badge/$ENC.svg" | grep -q "<svg"
+          kill $BPID 2>/dev/null || true
 
       - name: Commit pulse report
         run: |
@@ -36,7 +82,12 @@ jobs:
           git add docs/registry/ || true
           if git diff --cached --quiet; then
             echo "no pulse changes"
-            exit 0
+          else
+            git commit -m "chore(registry): pulse $(date -u +%F) [skip ci]"
+            git push
           fi
-          git commit -m "chore(registry): pulse $(date -u +%F) [skip ci]"
-          git push
+
+      - name: Deploy Pages (leaderboard)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main

@@ -55,11 +55,14 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 	maxPages := fs.Int("max-pages", 100, "hard page cap even with --all")
 	pageDelay := fs.Duration("page-delay", 500*time.Millisecond, "throttle between registry pages")
 	timeout := fs.Duration("http-timeout", 30*time.Second, "registry HTTP timeout")
+	retries := fs.Int("retries", 3, "attempts per registry page fetch")
+	retryBackoff := fs.Duration("retry-backoff", 3*time.Second, "linear backoff step between page-fetch retries")
 	if err := fs.Parse(args); err != nil {
 		return 2
 	}
 
 	client := &http.Client{Timeout: *timeout}
+	attempts := maxInt(1, *retries)
 
 	// 1) pull pages
 	var entries []regEntry
@@ -70,18 +73,9 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 	}
 	for p := 0; p < pageLimit; p++ {
 		url := *registry + "/v0/servers?cursor=" + cursor
-		req, _ := http.NewRequest(http.MethodGet, url, nil)
-		req.Header.Set("Accept", "application/json")
-		resp, err := client.Do(req)
+		page, err := fetchRegistryPage(client, url, attempts, *retryBackoff, stderr)
 		if err != nil {
 			fmt.Fprintf(stderr, "verax registry-pulse: page %d: %v\n", p+1, err)
-			return 1
-		}
-		var page regPage
-		err = json.NewDecoder(resp.Body).Decode(&page)
-		resp.Body.Close()
-		if err != nil {
-			fmt.Fprintf(stderr, "verax registry-pulse: decode page %d: %v\n", p+1, err)
 			return 1
 		}
 		entries = append(entries, page.Servers...)
@@ -204,6 +198,11 @@ func runRegistryPulse(args []string, stdout, stderr io.Writer) int {
 		fmt.Fprintf(stderr, "verax registry-pulse: %v\n", err)
 		return 1
 	}
+	// pulse-latest.json feeds the badge service; keep it in lockstep
+	if err := os.WriteFile(*outDir+"/pulse-latest.json", raw, 0o644); err != nil {
+		fmt.Fprintf(stderr, "verax registry-pulse: %v\n", err)
+		return 1
+	}
 
 	mdPath := *outDir + "/pulse-" + date + ".md"
 	var b strings.Builder
@@ -231,6 +230,39 @@ func max(a, b int) int {
 		return a
 	}
 	return b
+}
+
+// fetchRegistryPage GETs one registry page, retrying transport errors,
+// non-2xx statuses and undecodable bodies up to `attempts` times with
+// linear backoff (the live registry intermittently TLS-times-out).
+func fetchRegistryPage(client *http.Client, url string, attempts int, backoff time.Duration, stderr io.Writer) (regPage, error) {
+	var lastErr error
+	for a := 0; a < attempts; a++ {
+		if a > 0 {
+			fmt.Fprintf(stderr, "verax registry-pulse: retry %d/%d for %s\n", a+1, attempts, url)
+			time.Sleep(time.Duration(a) * backoff)
+		}
+		req, _ := http.NewRequest(http.MethodGet, url, nil)
+		req.Header.Set("Accept", "application/json")
+		resp, err := client.Do(req)
+		if err != nil {
+			lastErr = err
+			continue
+		}
+		var page regPage
+		err = json.NewDecoder(resp.Body).Decode(&page)
+		resp.Body.Close()
+		if err != nil {
+			lastErr = err
+			continue
+		}
+		if resp.StatusCode < 200 || resp.StatusCode > 299 {
+			lastErr = fmt.Errorf("registry returned HTTP %d", resp.StatusCode)
+			continue
+		}
+		return page, nil
+	}
+	return regPage{}, lastErr
 }
 
 func maxInt(a, b int) int {
