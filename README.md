@@ -6,7 +6,7 @@
 > *Registry discovers. Verax verifies.* / 注册表负责发现，Verax 负责证明。
 
 [![CI](https://github.com/Hai-Wenxiang/mcp-verax/actions/workflows/ci.yml/badge.svg)](https://github.com/Hai-Wenxiang/mcp-verax/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/badge/release-v0.1.0-blue)](https://github.com/Hai-Wenxiang/mcp-verax/releases/tag/v0.1.0)
+[![Release](https://img.shields.io/github/v/release/Hai-Wenxiang/mcp-verax)](https://github.com/Hai-Wenxiang/mcp-verax/releases/latest)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](./LICENSE)
 
 ## English
@@ -31,10 +31,10 @@ self-scan 100/100 — the flywheel (template → suite-green → scan-clean) run
 
 | Component | What it does | Status |
 |---|---|---|
-| **Verax Test Kit** (`verax test`) | Declarative YAML test suites for MCP servers: handshake/primitive assertions, result snapshots, schema-driven fuzzing, latency SLOs, process-leak detection. Ships as a single Go binary. | ✅ v0.1.0 released |
-| **Verax Scanner** (`verax scan`) | 16 rules (js/py/pkg) + osv.dev CVEs → SARIF, 0–100 score, `--min-score` CI gate. | ✅ v0.2.0 |
-| **Verax Templates** (`verax new`) | 6 zero-dep scaffolds — filesystem-safe, csv-query, notes-store, rest-api-wrap, web-fetch-md, db-readonly — each suite-green and self-scan 100/100. | 🚧 M3 |
-| **Verax Registry Intelligence** | Registry mirror + batch quality pipeline → leaderboard & quarterly ecosystem reports. | M4 |
+| **Verax Test Kit** (`verax test`) | Declarative YAML test suites for MCP servers: handshake/primitive assertions, result snapshots, schema-driven fuzzing, latency SLOs, process-leak detection. Ships as a single Go binary. | ✅ shipped |
+| **Verax Scanner** (`verax scan`) | 16 rules (js/py/pkg) + osv.dev CVEs → SARIF, 0–100 score, `--min-score` / `--fail-level` CI gates. | ✅ shipped |
+| **Verax Templates** (`verax new`) | 6 zero-dep scaffolds — filesystem-safe, csv-query, notes-store, rest-api-wrap, web-fetch-md, db-readonly — each suite-green and self-scan 100/100. | ✅ 6 templates · M3 productization next |
+| **Verax Registry Intelligence** | Registry pulse (nightly sample + weekly full walk) → live leaderboard, score badges, trend lines. Quarterly ecosystem reports later. | 🚧 live · [leaderboard](https://hai-wenxiang.github.io/mcp-verax/) |
 
 [Changelog](./CHANGELOG.md) · Docs index: [`docs/`](./docs/README.md) — [STATUS](./docs/STATUS.md) · [test-kit](./docs/test-kit.md) · [scanner](./docs/scanner.md) · [rules](./docs/rules.md) · [findings](./compat/FINDINGS.md). Contributing: [`CONTRIBUTING.md`](./CONTRIBUTING.md) · [`AGENTS.md`](./AGENTS.md).
 
@@ -51,14 +51,14 @@ verax scan @scope/mcp-server --badge b.svg --min-score 90      # 规则+CVE 评�
 verax new csv-query my-server                                 # 零依赖模板脚手架（套件绿、自扫满分）
 ```
 
-**规划组件（M1 → M4）：**
+**组件（M1 → M4）：**
 
 | 组件 | 作用 | 状态 |
 |---|---|---|
-| **Verax Test Kit**（`verax test`） | 声明式 YAML 测试套件：握手/原语断言、结果快照、Schema 驱动模糊测试、延迟 SLO、进程泄漏检测。以 Go 单二进制分发。 | 🚧 M1 开发中 |
-| **Verax Scanner** | 安全/质量/隐私三类规则包 + 动态探针 → SARIF、0–100 评分、徽章。 | M2 |
-| **Verax Templates** | 内置测试与安全默认值的 server 脚手架（多语言）。 | M3 |
-| **Verax Registry Intelligence** | 注册表镜像 + 批量质检流水线 → 榜单与季度生态报告。 | M4 |
+| **Verax Test Kit**（`verax test`） | 声明式 YAML 测试套件：握手/原语断言、结果快照、Schema 驱动模糊测试、延迟 SLO、进程泄漏检测。以 Go 单二进制分发。 | ✅ 已交付 |
+| **Verax Scanner**（`verax scan`） | 安全/质量/隐私三类规则包 + osv.dev CVE → SARIF、0–100 评分、`--min-score` / `--fail-level` CI 门禁。 | ✅ 已交付 |
+| **Verax Templates**（`verax new`） | 6 个零依赖脚手架——filesystem-safe、csv-query、notes-store、rest-api-wrap、web-fetch-md、db-readonly——套件绿、自扫满分。 | ✅ 6 模板 · M3 产品化待启 |
+| **Verax Registry Intelligence** | 注册表脉冲（每夜抽样 + 每周全量）→ 线上榜单、评分徽章、趋势线。季度生态报告后续。 | 🚧 [线上榜单](https://hai-wenxiang.github.io/mcp-verax/) |
 
 设计文档：[`docs/STATUS.md`](./docs/STATUS.md)（进展）、[`docs/adr/`](./docs/adr/)（决策）、[`AGENTS.md`](./AGENTS.md)（贡献指南）。
 

@@ -3,7 +3,7 @@
 > Overall progress of Verax components. Updated per feature release.
 > Verax 各组件总体进展，随每个功能完成而更新。
 
-## Current Milestone: M1 — Verax Test Kit / 当前里程碑：M1 Test Kit
+## Milestone (shipped): M1 — Verax Test Kit / 已交付里程碑：M1 Test Kit
 
 | Feature | Status | Notes |
 |---|---|---|
@@ -43,7 +43,10 @@
 | leaderboard sparklines | ✅ Done | inline SVG score dots+polyline per package (grows from 2nd pulse) |
 | community fuzz corpus (corpus/fuzz/*.txt) | ✅ Done | embedded, PR-welcome, hygiene-enforced |
 | registry-pulse --all (full walk) | ✅ Done | page cap + polite throttle; live verified |
-| next: weekly full walk schedule | ⬜ Next | |
+| weekly full-walk schedule | ✅ Done | Mon 05:33 Beijing cron + `full-walk` dispatch input; 150-pkg sample |
+| nightly loop closes itself | ✅ Done | pulse → leaderboard regen → badge smoke → commit → Pages deploy trigger; page-fetch retry 3× linear backoff; pulse-latest.json auto-written |
+| corpus categories sql/json-rpc/xss | ✅ Done | 3 new files, 8 categories total |
+| next: quarterly ecosystem report | ⬜ Next | |
 
 Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 
@@ -51,9 +54,9 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 
 | Component | Milestone | Status |
 |---|---|---|
-| Verax Scanner (security/quality/privacy rule packs, SARIF, score) | M2 | ⬜ Not started |
-| Verax Templates (TS + Python scaffolds) | M3 | ⬜ Not started |
-| Verax Registry Intelligence (mirror, leaderboard, quarterly report) | M4 | ⬜ Not started |
+| Verax Scanner (security/quality/privacy rule packs, SARIF, score) | M2 | ✅ Shipped (16 rules, osv CVEs, gates) |
+| Verax Templates (TS + Python scaffolds) | M3 | 🚧 6 templates shipped with `verax new`; productization next |
+| Verax Registry Intelligence (mirror, leaderboard, quarterly report) | M4 | 🚧 Nightly pulse + live leaderboard + badges; quarterly report next |
 | MCP gateway | — | ⏸ Evaluated, deferred (crowded space; see research docs) |
 
 ## Changelog / 变更日志

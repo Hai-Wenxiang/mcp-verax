@@ -2,6 +2,16 @@
 
 All notable changes. Dates are 2026-11-08 (initial development day).
 
+## v0.8.1
+- Weekly full-registry walk: Monday 05:33 Beijing cron + `full-walk`
+  workflow dispatch input (150-pkg sample, `--max-pages` bounded)
+- Nightly loop now closes itself: pulse → leaderboard regen → badge
+  smoke → commit → Pages deploy trigger (previously manual steps)
+- `verax registry-pulse`: page-fetch retry (3× linear backoff, non-2xx
+  aware) and automatic `pulse-latest.json` write (badge service data)
+- Fuzz corpus: 3 new categories — `sql-injection`, `json-rpc`, `xss`
+  (8 total)
+
 ## v0.8.0
 - `verax scan --fail-level low|medium|high|critical` severity gate
 - Leaderboard: trend sparklines (SVG), pulse retry/backoff, Pages live
