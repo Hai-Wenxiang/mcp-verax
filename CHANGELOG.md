@@ -8,6 +8,8 @@ All notable changes. Dates are 2026-11-08 (initial development day).
   markdown gains a Registry column
 - npm/crate pools deduped independently by highest version; shared
   dedupe/count helpers extracted with tests
+- weekly full-walk cron corrected to Sunday 21:33 UTC (Monday 05:33
+  Beijing, as documented)
 
 ## v0.11.0
 - `verax scan crate:name[@version]`: scan published crates.io artifacts —

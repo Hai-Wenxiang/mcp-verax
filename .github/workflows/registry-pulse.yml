@@ -8,7 +8,7 @@ name: registry-pulse
 on:
   schedule:
     - cron: '17 20 * * *'   # 04:17 Beijing, daily — sample: 10 pages / 30 pkgs
-    - cron: '33 21 * * 1'   # 05:33 Beijing, Monday — full-registry walk
+    - cron: '33 21 * * 0'   # 05:33 Beijing, Monday — full-registry walk
   workflow_dispatch:
     inputs:
       full-walk:
@@ -36,7 +36,7 @@ jobs:
         id: args
         run: |
           FULL=false
-          if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" = "33 21 * * 1" ]; then
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" = "33 21 * * 0" ]; then
             FULL=true
           fi
           if [ "${{ inputs.full-walk }}" = "true" ]; then
