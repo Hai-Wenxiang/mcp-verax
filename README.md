@@ -26,10 +26,10 @@ verax test your-server.suite.yaml --html report.html
 |---|---|---|
 | **Verax Test Kit** (`verax test`) | Declarative YAML test suites for MCP servers: handshake/primitive assertions, result snapshots, schema-driven fuzzing, latency SLOs, process-leak detection. Ships as a single Go binary. | ✅ v0.1.0 released |
 | **Verax Scanner** (`verax scan`) | 16 rules (js/py/pkg) + osv.dev CVEs → SARIF, 0–100 score, `--min-score` CI gate. | ✅ v0.2.0 |
-| **Verax Templates** | MCP server scaffolds with tests and secure defaults baked in. filesystem-safe + csv-query shipped. | 🚧 M3 |
+| **Verax Templates** (`verax new`) | 5 zero-dep scaffolds — filesystem-safe, csv-query, notes-store, rest-api-wrap, web-fetch-md — each suite-green and self-scan 100/100. | 🚧 M3 |
 | **Verax Registry Intelligence** | Registry mirror + batch quality pipeline → leaderboard & quarterly ecosystem reports. | M4 |
 
-Design docs: [`docs/STATUS.md`](./docs/STATUS.md) (progress), [`docs/adr/`](./docs/adr/) (decisions), [`AGENTS.md`](./AGENTS.md) (contributing).
+Docs index: [`docs/`](./docs/README.md) — [STATUS](./docs/STATUS.md) · [test-kit](./docs/test-kit.md) · [scanner](./docs/scanner.md) · [rules](./docs/rules.md) · [findings](./compat/FINDINGS.md). Contributing: [`AGENTS.md`](./AGENTS.md).
 
 ## 中文
 
