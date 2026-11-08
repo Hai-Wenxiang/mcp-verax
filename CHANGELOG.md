@@ -2,6 +2,12 @@
 
 All notable changes. Dates are 2026-11-08 (initial development day).
 
+## v0.7.0
+- `apps/badge`: badge service over pulse data (SVG, healthz, hourly reload)
+- `apps/leaderboard` + `verax leaderboard`: pulses → static self-contained
+  HTML leaderboard; nightly workflow regenerates after each pulse
+- M4's visible loop closed end-to-end on live registry data
+
 ## v0.6.0
 - `verax registry-pulse`: official MCP registry pull → sample scans → dated
   JSON+MD reports; nightly workflow commits pulses to docs/registry/

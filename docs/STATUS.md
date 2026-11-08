@@ -112,3 +112,6 @@ Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
 
 - 2026-11-08 (final hour): badge service + leaderboard page; M4's visible
   loop (registry → scan → badges/leaderboard) complete end-to-end.
+
+- 2026-11-08 — **v0.7.0 released**: badge service + leaderboard — M4's
+  registry→scan→badges/board loop closed on live data.
