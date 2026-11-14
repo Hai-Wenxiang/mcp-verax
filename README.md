@@ -25,6 +25,9 @@ verax scan pypi:mcp-server-fetch                        # and PyPI sdists
 verax scan gh:owner/mcp-server --min-score 80            # any public GitHub repo
 ```
 
+Agent user? Install the [verax skill](./skills/verax/SKILL.md) — teaches
+Claude Code / Cursor / Copilot & co. when and how to run verax.
+
 **Field evidence** (2026-11-08): scanning the *official* `@modelcontextprotocol/server-memory`
 found 6 dependency advisories (see [compat/FINDINGS.md](./compat/FINDINGS.md) F-4); the SSRF probe
 cleared official server-everything (17 tools, 0 outbound hits); five scaffold templates all

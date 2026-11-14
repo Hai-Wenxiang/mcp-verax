@@ -2,6 +2,16 @@
 
 All notable changes. Dates are 2026-11-08 (initial development day).
 
+## v0.15.0
+- official agent skill (`skills/verax/SKILL.md`): teaches coding agents
+  when/how to run verax — pinned release install with SHA256SUMS
+  verification, command routing (init/test/scan/new/rules), CI gates,
+  output interpretation, pitfalls
+- skill shape gated by `skills/skills_test.go` (frontmatter, checksum
+  install required, CLI surface + target prefixes asserted)
+- prompt for shipping a verax skill came from an Agensi.io marketplace
+  outreach; the skill itself is free and marketplace-agnostic
+
 ## v0.14.0
 - `verax scan gh:owner/repo[@ref]`: scan any public GitHub repository —
   ref defaults to the latest release tag (default branch as fallback);

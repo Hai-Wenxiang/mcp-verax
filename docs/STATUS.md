@@ -52,6 +52,7 @@
 | pulse scans crate-packaged entries | ✅ Done | registry `crates.io`/`crate` packages join the nightly sample (`--sample-crates`, default 5); rows carry a `registry` field; npm+crate deduped per highest version |
 | PyPI scan targets (`pypi:`) | ✅ Done | sdist fetch (tar.gz + zip, escape-proof), PEP 503 name normalization, version resolve; live: mcp-server-fetch → 98/100; pulse gains `--sample-pypi` (default 5) |
 | GitHub repo targets (`gh:`) | ✅ Done | latest-release → default-branch resolve, codeload fetch, pax_global_header-aware top-dir strip; live: modelcontextprotocol/servers 276 files; self-scan of this repo's archive stays 100/100 in the action self-test. Registry survey: no `github` registryType entries yet, so no pulse pool — user-facing target only |
+| official agent skill (`skills/verax/`) | ✅ Done | SKILL.md: pinned+checksum install, command routing, gates, pitfalls; shape-gated by skills_test; installed into the local agent environment; marketplace listing is a maintainer step |
 | next: M3 kickoff (ADR-002 language, needs user) | ⬜ Next | non-blocking queue drained |
 
 Status legend: ⬜ Planned ｜ 🚧 In progress ｜ ✅ Done ｜ ⏸ Deferred
