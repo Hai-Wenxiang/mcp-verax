@@ -1,10 +1,10 @@
 {
-  "date": "2026-11-19",
+  "date": "2026-11-20",
   "entries_pulled": 300,
-  "npm_packaged": 53,
+  "npm_packaged": 55,
   "crate_packaged": 0,
   "pypi_packaged": 1,
-  "scanned": 29,
+  "scanned": 30,
   "rows": [
     {
       "name": "agency.extremely/agency",
@@ -167,6 +167,13 @@
           "Why": "no containment check in this file — a crafted path can escape the workspace"
         }
       ]
+    },
+    {
+      "name": "ai.achurch/church",
+      "package": "mcp-church@1.0.3",
+      "registry": "npm",
+      "score": 100,
+      "files": 2
     },
     {
       "name": "ai.adeu/adeu",
