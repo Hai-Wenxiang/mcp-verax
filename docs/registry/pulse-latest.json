@@ -1,10 +1,10 @@
 {
-  "date": "2026-11-20",
+  "date": "2026-11-21",
   "entries_pulled": 300,
-  "npm_packaged": 55,
+  "npm_packaged": 53,
   "crate_packaged": 0,
   "pypi_packaged": 1,
-  "scanned": 30,
+  "scanned": 28,
   "rows": [
     {
       "name": "agency.extremely/agency",
@@ -2328,20 +2328,6 @@
     {
       "name": "ai.agentutility/mcp-synthforge",
       "package": "@agentutility/mcp-synthforge@0.8.2",
-      "registry": "npm",
-      "score": 100,
-      "files": 3
-    },
-    {
-      "name": "ai.agentutility/mcp-web-probe",
-      "package": "@agentutility/mcp-web-probe@0.32.1",
-      "registry": "npm",
-      "score": 100,
-      "files": 3
-    },
-    {
-      "name": "ai.agentutility/mcp-wordmint",
-      "package": "@agentutility/mcp-wordmint@0.16.1",
       "registry": "npm",
       "score": 100,
       "files": 3
