@@ -1,10 +1,10 @@
 {
-  "date": "2026-11-21",
+  "date": "2026-11-22",
   "entries_pulled": 300,
-  "npm_packaged": 53,
+  "npm_packaged": 52,
   "crate_packaged": 0,
   "pypi_packaged": 1,
-  "scanned": 28,
+  "scanned": 26,
   "rows": [
     {
       "name": "agency.extremely/agency",
@@ -134,7 +134,7 @@
     },
     {
       "name": "ai.achromat/mcp-server",
-      "package": "@achromat-ai/mcp-server@0.1.5",
+      "package": "@achromat-ai/mcp-server@0.1.6",
       "registry": "npm",
       "score": 82,
       "files": 9,
@@ -2314,20 +2314,6 @@
     {
       "name": "ai.agentutility/mcp-rollforge",
       "package": "@agentutility/mcp-rollforge@0.1.5",
-      "registry": "npm",
-      "score": 100,
-      "files": 3
-    },
-    {
-      "name": "ai.agentutility/mcp-statline",
-      "package": "@agentutility/mcp-statline@0.1.3",
-      "registry": "npm",
-      "score": 100,
-      "files": 3
-    },
-    {
-      "name": "ai.agentutility/mcp-synthforge",
-      "package": "@agentutility/mcp-synthforge@0.8.2",
       "registry": "npm",
       "score": 100,
       "files": 3
