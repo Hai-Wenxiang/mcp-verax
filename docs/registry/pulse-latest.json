@@ -1,10 +1,10 @@
 {
-  "date": "2026-11-22",
+  "date": "2026-11-23",
   "entries_pulled": 300,
-  "npm_packaged": 52,
+  "npm_packaged": 48,
   "crate_packaged": 0,
   "pypi_packaged": 1,
-  "scanned": 26,
+  "scanned": 21,
   "rows": [
     {
       "name": "agency.extremely/agency",
@@ -2279,41 +2279,6 @@
     {
       "name": "ai.agentutility/mcp-matchpoint",
       "package": "@agentutility/mcp-matchpoint@0.1.4",
-      "registry": "npm",
-      "score": 100,
-      "files": 3
-    },
-    {
-      "name": "ai.agentutility/mcp-mediakit",
-      "package": "@agentutility/mcp-mediakit@0.11.9",
-      "registry": "npm",
-      "score": 100,
-      "files": 3
-    },
-    {
-      "name": "ai.agentutility/mcp-model-router",
-      "package": "@agentutility/mcp-model-router@0.1.1",
-      "registry": "npm",
-      "score": 100,
-      "files": 3
-    },
-    {
-      "name": "ai.agentutility/mcp-prooflayer",
-      "package": "@agentutility/mcp-prooflayer@0.2.4",
-      "registry": "npm",
-      "score": 100,
-      "files": 3
-    },
-    {
-      "name": "ai.agentutility/mcp-retail",
-      "package": "@agentutility/mcp-retail@0.2.1",
-      "registry": "npm",
-      "score": 100,
-      "files": 3
-    },
-    {
-      "name": "ai.agentutility/mcp-rollforge",
-      "package": "@agentutility/mcp-rollforge@0.1.5",
       "registry": "npm",
       "score": 100,
       "files": 3
