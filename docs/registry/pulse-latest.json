@@ -1,10 +1,10 @@
 {
-  "date": "2026-11-24",
+  "date": "2026-11-25",
   "entries_pulled": 300,
-  "npm_packaged": 50,
+  "npm_packaged": 43,
   "crate_packaged": 0,
-  "pypi_packaged": 1,
-  "scanned": 23,
+  "pypi_packaged": 2,
+  "scanned": 17,
   "rows": [
     {
       "name": "agency.extremely/agency",
@@ -2238,64 +2238,31 @@
       "files": 3
     },
     {
-      "name": "ai.agentutility/mcp-compose",
-      "package": "@agentutility/mcp-compose@0.13.0",
-      "registry": "npm",
-      "score": 96,
-      "files": 3,
+      "name": "agency.shipmate/shipready-mcp",
+      "package": "pypi:shipready-mcp@0.1.0",
+      "registry": "pypi",
+      "score": 98,
+      "files": 2,
       "findings": [
         {
-          "RuleID": "VX-SEC-008",
-          "Title": "outbound request to non-literal URL without allowlist",
-          "Severity": "medium",
-          "File": "dist/tools.generated.js",
-          "Line": 2518,
-          "Snippet": "\"description\": \"Page URL to fetch (http or https). Follows redirects.\"",
-          "Why": "tool-controlled URLs can target internal services (SSRF) unless destinations are constrained"
+          "RuleID": "VX-QUA-105",
+          "Title": "no LICENSE file",
+          "Severity": "low",
+          "File": ".",
+          "Line": 0,
+          "Snippet": "",
+          "Why": "users cannot legally rely on the project"
+        },
+        {
+          "RuleID": "VX-QUA-106",
+          "Title": "no README",
+          "Severity": "low",
+          "File": ".",
+          "Line": 0,
+          "Snippet": "",
+          "Why": "published package ships without usage or intent documentation"
         }
       ]
-    },
-    {
-      "name": "ai.agentutility/mcp-edge-finance",
-      "package": "@agentutility/mcp-edge-finance@0.18.8",
-      "registry": "npm",
-      "score": 100,
-      "files": 3
-    },
-    {
-      "name": "ai.agentutility/mcp-edge-market",
-      "package": "@agentutility/mcp-edge-market@0.15.6",
-      "registry": "npm",
-      "score": 100,
-      "files": 3
-    },
-    {
-      "name": "ai.agentutility/mcp-locale",
-      "package": "@agentutility/mcp-locale@0.8.7",
-      "registry": "npm",
-      "score": 100,
-      "files": 3
-    },
-    {
-      "name": "ai.agentutility/mcp-matchpoint",
-      "package": "@agentutility/mcp-matchpoint@0.1.4",
-      "registry": "npm",
-      "score": 100,
-      "files": 3
-    },
-    {
-      "name": "ai.agentutility/mcp-mediakit",
-      "package": "@agentutility/mcp-mediakit@0.11.9",
-      "registry": "npm",
-      "score": 100,
-      "files": 3
-    },
-    {
-      "name": "ai.agentutility/mcp-model-router",
-      "package": "@agentutility/mcp-model-router@0.1.1",
-      "registry": "npm",
-      "score": 100,
-      "files": 3
     },
     {
       "name": "ai.adeu/adeu",
