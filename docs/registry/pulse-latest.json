@@ -1,10 +1,10 @@
 {
-  "date": "2026-11-25",
+  "date": "2026-11-26",
   "entries_pulled": 300,
-  "npm_packaged": 43,
+  "npm_packaged": 39,
   "crate_packaged": 0,
   "pypi_packaged": 2,
-  "scanned": 17,
+  "scanned": 13,
   "rows": [
     {
       "name": "agency.extremely/agency",
@@ -2208,34 +2208,6 @@
           "Why": "command string is constructed, not a literal — injection surface"
         }
       ]
-    },
-    {
-      "name": "ai.agenttrust/mcp-server",
-      "package": "@agenttrust/mcp-server@1.1.1",
-      "registry": "npm",
-      "score": 100,
-      "files": 7
-    },
-    {
-      "name": "ai.agentutility/mcp-agentops",
-      "package": "@agentutility/mcp-agentops@0.1.1",
-      "registry": "npm",
-      "score": 100,
-      "files": 3
-    },
-    {
-      "name": "ai.agentutility/mcp-bestiary",
-      "package": "@agentutility/mcp-bestiary@0.1.3",
-      "registry": "npm",
-      "score": 100,
-      "files": 3
-    },
-    {
-      "name": "ai.agentutility/mcp-browser-workflow",
-      "package": "@agentutility/mcp-browser-workflow@0.1.1",
-      "registry": "npm",
-      "score": 100,
-      "files": 3
     },
     {
       "name": "agency.shipmate/shipready-mcp",
